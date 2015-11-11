@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="openssl"
+VER="1.0.2d"
+URL="https://openssl.org/source/openssl-1.0.2.tar.gz"
+PREFIX=""
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	./config --prefix=/usr --openssldir=/etc/ssl --libdir=lib shared zlib-dynamic &&
+	make $GLOBAL_CFLAGS $CFLAGS
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to temporary folder"
+	cd $SRC_DIR/$PKG-$VER
+	make MANDIR=/usr/share/man MANSUFFIX=ssl INSTALL_PREFIX="$FAKEROOT" install
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	logMessage "Deleting temporary $PKG folder"
+	rm -rf $PKG-$VER
+}
