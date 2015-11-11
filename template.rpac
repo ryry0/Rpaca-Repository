@@ -1,0 +1,141 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG=""
+VER=""
+URL=""
+PREFIX=""
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	logMessage "Downloading $PKG"
+	curl -O $URL
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.tar.gz
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	./configure --prefix=/usr &&
+	make $GLOBAL_CFLAGS $CFLAGS
+}
+
+cleanSource() {
+	logMessage "Cleaning $PKG source"
+	cd $SRC_DIR/$PKG-$VER
+	make clean
+}
+
+# Run make check on package
+checkSource() {
+	logMessage "Checking $PKG"
+	cd $SRC_DIR/$PKG-$VER
+	make check
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to temporary folder"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" install
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	logMessage "Deleting temporary $PKG folder"
+	rm -rf $PKG-$VER
+}
+
+preinstallPackage() {
+	logMessage "PreInstall $PKG"
+	cd $PKG_DIR
+	logMessage "Extracting $PKG package"
+	tar -xvzf $PKG-$VER.tar.gz
+	cd $FAKEROOT
+	return
+}
+
+# install the program from the standalone package
+installPackage() {
+	logMessage "Installing $PKG"
+	logMessage "CDing to $PKG fakeroot"
+	cd $FAKEROOT
+
+	logMessage "Creating $PKG directories"
+	for dir in $(find . -type d | sed -e 's@./@@'); do
+		install -dv /${dir}
+		#echo creating /${dir}
+	done
+
+	logMessage "Copying $PKG files"
+	for file in $(find . ! -type d | sed -e 's@./@@'); do
+		#echo ${file} " -> " /${file}
+		cp -dpf ${file} /${file}
+	done
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
+
+preremovePackage() {
+	logMessage "PreRemove $PKG"
+	return
+}
+
+removePackage() {
+	logMessage "Removing $PKG"
+	cd $PKG_INDEX
+	for file in $( cat $PKG_INDEX/$PKG-$VER ); do
+		#finds packages that need the same file
+		if grep -qlr "^$file$" --exclude=$PKG-$VER
+		then
+			echo $file needed by $(grep -lr "^$file$" --exclude=$PKG-$VER)
+		else
+			rm -fv $file
+		fi
+	done
+	return
+}
+
+postremovePackage() {
+	logMessage "PostRemove $PKG"
+	logMessage "Removing $PKG from index"
+	rm -v $PKG_INDEX/$PKG-$VER
+	return
+}
+
+deleteSource() {
+	logMessage "Deleting $PKG source"
+	rm -rfv $SRC_DIR/$PKG-$VER
+}
+
+deleteDownload() {
+	logMessage "Deleting $PKG source archive"
+	rm -rfv $SRC_DIR/$PKG-$VER.tar.gz
+}
+
+deletePackage() {
+	logMessage "Deleting $PKG source archive"
+	rm -rfv $PKG_DIR/$PKG-$VER.tar.gz
+}

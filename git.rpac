@@ -1,0 +1,55 @@
+#!/bin/bash
+#TODO install and track man pages
+
+# Overloaded variables:
+PKG="git"
+VER="2.5.0"
+URL="https://www.kernel.org/pub/software/scm/git/$PKG-$VER.tar.xz"
+PREFIX=""
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	logMessage "Downloading $PKG"
+	curl -O $URL
+
+	logMessage "Downloading $PKG man pages"
+	curl -O "https://www.kernel.org/pub/software/scm/git/git-manpages-2.5.0.tar.xz"
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	xz -d $PKG-$VER.tar.xz
+	tar -xvf $PKG-$VER.tar
+
+	#xz -d $PKG-manpages-$VER.tar.xz
+	#tar -xvf $PKG-manpages-$VER.tar
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	./configure --prefix=/usr --with-gitconfig=/etc/gitconfig &&
+	make $GLOBAL_CFLAGS $CFLAGS
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	#install man pages
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
