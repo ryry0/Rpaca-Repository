@@ -4,7 +4,8 @@
 PKG="curl"
 VER="7.45.0"
 URL="curl.haxx.se/download/$PKG-$VER.tar.gz"
-PREFIX=""
+DESCRIPTION="The cURL package contains a utility and library used for transferring files.\
+to any of the following protocols: FTP, HTTP, HTTPS, SFTP, and more."
 CFLAGS=""
 FAKEROOT=$PKG_DIR/$PKG-$VER
-DEPS=""
+DEPS="openssl"

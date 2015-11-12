@@ -4,7 +4,7 @@
 PKG="openssl"
 VER="1.0.2d"
 URL="https://openssl.org/source/openssl-1.0.2.tar.gz"
-PREFIX=""
+DESCRIPTION="The OpenSSL package contains management tools and libraries relating to cryptography."
 CFLAGS=""
 FAKEROOT=$PKG_DIR/$PKG-$VER
 DEPS=""

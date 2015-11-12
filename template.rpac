@@ -4,7 +4,7 @@
 PKG=""
 VER=""
 URL=""
-PREFIX=""
+DESCRIPTION=""
 CFLAGS=""
 FAKEROOT=$PKG_DIR/$PKG-$VER
 DEPS=""
@@ -14,6 +14,7 @@ DEPS=""
 
 # Dl package
 downloadSource() {
+	cd $SRC_DIR
 	logMessage "Downloading $PKG"
 	curl -O $URL
 }

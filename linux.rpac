@@ -4,7 +4,7 @@
 PKG="linux"
 VER="3.14.21"
 URL=""
-PREFIX=""
+DESCRIPTION="The Linux Kernel."
 CFLAGS=""
 FAKEROOT=$PKG_DIR/$PKG-$VER
 DEPS=""

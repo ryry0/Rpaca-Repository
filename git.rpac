@@ -5,16 +5,17 @@
 PKG="git"
 VER="2.5.0"
 URL="https://www.kernel.org/pub/software/scm/git/$PKG-$VER.tar.xz"
-PREFIX=""
+DESCRIPTION="Git is an open source, distributed version control system."
 CFLAGS=""
 FAKEROOT=$PKG_DIR/$PKG-$VER
-DEPS=""
+DEPS="openssl curl"
 
 #---------------------------------------------------------------
 # Overloadable functions:
 
 # Dl package
 downloadSource() {
+	cd $SRC_DIR
 	logMessage "Downloading $PKG"
 	curl -O $URL
 
