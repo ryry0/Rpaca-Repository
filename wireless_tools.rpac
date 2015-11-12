@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="wireless_tools"
+VER="29"
+URL="https://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/$PKG.$VER.tar.gz"
+DESCRIPTION="The Wireless Extension is a generic API in the Linux Kernel allowing a driver to
+expose configuration and statistics specfic to common Wireless LANs to user space."
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	logMessage "Downloading $PKG"
+	cd $SRC_DIR
+	curl -O $URL
+	mv $PKG.$VER.tar.gz $PKG-$VER.tar.gz
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.tar.gz
+	mv $PKG.$VER $PKG-$VER
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	make $GLOBAL_CFLAGS $CFLAGS
+}
+
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to temporary folder"
+	cd $SRC_DIR/$PKG-$VER
+	make PREFIX=$FAKEROOT/usr INSTALL_MAN=$FAKEROOT/usr/share/man install
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	logMessage "Deleting temporary $PKG folder"
+	rm -rf $PKG-$VER
+}
