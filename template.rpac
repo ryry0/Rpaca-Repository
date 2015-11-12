@@ -48,13 +48,13 @@ checkSource() {
 
 # Take compiled files and make them into a standalone package
 buildPackage() {
-	logMessage "Building $PKG to temporary folder"
+	logMessage "Building $PKG to fakeroot"
 	cd $SRC_DIR/$PKG-$VER
 	make DESTDIR="$FAKEROOT" install
 	cd $PKG_DIR
 	logMessage "Tarring and compressing $PKG"
 	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
-	logMessage "Deleting temporary $PKG folder"
+	logMessage "Deleting $PKG fakeroot"
 	rm -rf $PKG-$VER
 }
 
