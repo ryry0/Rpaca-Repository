@@ -8,7 +8,7 @@ URL="http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/$PKG-$VER.tar.gz"
 DESCRIPTION="The OpenSSH package contains ssh clients and the sshd daemon."
 CFLAGS=""
 FAKEROOT=$PKG_DIR/$PKG-$VER
-DEPS=""
+DEPS="openssl"
 
 #---------------------------------------------------------------
 # Overloadable functions:
