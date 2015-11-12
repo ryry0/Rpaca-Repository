@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="wpa_supplicant"
+VER="2.5"
+URL="http://hostap.epitest.fi/releases/$PKG-$VER.tar.gz"
+DESCRIPTION="WPA Supplicant is a Wi-Fi Protected Access (WPA) Client and IEEE 802.1X supplicant"
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libnl openssl"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	cd $PKG
+	logMessage "Creating default $PKG config file"
+	echo "CONFIG_BACKEND=file" > .config
+	echo "CONFIG_CTRL_IFACE=y" >> .config
+	echo "CONFIG_DEBUG_FILE=y" >> .config
+	echo "CONFIG_DEBUG_SYSLOG=y" >> .config
+	echo "CONFIG_DEBUG_SYSLOG_FACILITY=LOG_DAEMON" >> .config
+	echo "CONFIG_DRIVER_NL80211=y" >> .config
+	echo "CONFIG_DRIVER_WEXT=y" >> .config
+	echo "CONFIG_DRIVER_WIRED=y" >> .config
+	echo "CONFIG_EAP_GTC=y" >> .config
+	echo "CONFIG_EAP_LEAP=y" >> .config
+	echo "CONFIG_EAP_MD5=y" >> .config
+	echo "CONFIG_EAP_MSCHAPV2=y" >> .config
+	echo "CONFIG_EAP_OTP=y" >> .config
+	echo "CONFIG_EAP_PEAP=y" >> .config
+	echo "CONFIG_EAP_TLS=y" >> .config
+	echo "CONFIG_EAP_TTLS=y" >> .config
+	echo "CONFIG_IEEE8021X_EAPOL=y" >> .config
+	echo "CONFIG_IPV6=y" >> .config
+	echo "CONFIG_LIBNL32=y" >> .config
+	echo "CONFIG_PEERKEY=y" >> .config
+	echo "CONFIG_PKCS12=y" >> .config
+	echo "CONFIG_READLINE=y" >> .config
+	echo "CONFIG_SMARTCARD=y" >> .config
+	echo "CONFIG_WPS=y" >> .config
+	echo "CFLAGS += -I/usr/include/libnl3" >> .config
+	make BINDIR=/sbin LIBDIR=/lib
+}
+
+# Run make check on package
+checkSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to temporary folder"
+	cd $SRC_DIR/$PKG-$VER
+	cd $PKG
+
+	logMessage "Creating $PKG folders in $FAKEROOT"
+	install -dv $FAKEROOT/sbin/
+	install -dv $FAKEROOT/usr/share/man/man5
+	install -dv $FAKEROOT/usr/share/man/man8
+
+	install -v -m755 wpa_{cli,passphrase,supplicant} $FAKEROOT/sbin/ &&
+	install -v -m644 doc/docbook/wpa_supplicant.conf.5 $FAKEROOT/usr/share/man/man5 &&
+	install -v -m644 doc/docbook/wpa_{cli,passphrase,supplicant}.8 $FAKEROOT/usr/share/man/man8
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	logMessage "Deleting temporary $PKG folder"
+	rm -rf $PKG-$VER
+}
