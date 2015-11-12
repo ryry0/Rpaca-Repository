@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="iwlwifi-6000-ucode"
+VER="9.221.4.1"
+URL=""
+DESCRIPTION="https://wireless.wiki.kernel.org/_media/en/users/drivers/$PKG-$VER.tgz"
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.tgz
+}
+
+compileSource() {
+	logMessage "Compiling $PKG not necessary"
+	return
+}
+
+cleanSource() {
+	logMessage "Cleaning $PKG source not necessary"
+	return
+}
+
+# Run make check on package
+checkSource() {
+	logMessage "Checking $PKG not necessary"
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to temporary folder"
+	cd $SRC_DIR/$PKG-$VER
+
+	install -d $FAKEROOT/lib/firmware
+	cp -dpf iwlwifi-6000-4.ucode $FAKEROOT/lib/firmware
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	logMessage "Deleting temporary $PKG folder"
+	rm -rf $PKG-$VER
+}
