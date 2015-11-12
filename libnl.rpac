@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libnl"
+VER="3.2.25"
+# Warning: URL depends on hash
+URL="http://pkgs.fedoraproject.org/repo/pkgs/libnl3/$PKG-$VER.tar.gz/03f74d0cd5037cadc8cdfa313bbd195c/$PKG-$VER.tar.gz"
+DESCRIPTION="The libnl suite is a collection of libraries providing APIs to netlink protocol based Linux Kernel interfaces."
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	./configure --prefix=/usr --sysconfdir=/etc --disable-static &&
+	make $GLOBAL_CFLAGS $CFLAGS
+}
