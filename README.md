@@ -1,5 +1,6 @@
 Repository for all the package build files
-TODO: (base clfs)
+TODO: 
+(bare clfs)
 Linux headers
 Man pages
 glibc
@@ -62,3 +63,46 @@ vim
 grub
 dhcpcd
 linux
+
+(base installation)
+X
+xorg-backlight
+xorg-synaptics
+xf86-video-intel/xf86-video-ati
+alsa
+alsa-utils
+spectrwm/bspwm
+rxvt-unicode
+chromium
+chromium flash?
+wicd
+xclip
+
+zsh
+avrgcc
+gdb
+ctags
+valgrind
+strace
+~~git~~
+tmux
+~~openssh~~
+inetutils - telnet
+sudo
+7zip
+tlp
+
+Julia
+Latex?
+gnuplot
+
+redshift
+syncthing
+mplayer
+feh
+unclutter
+syndaemon
+wmctrl
+compton
+infiality font bundle
+terminus

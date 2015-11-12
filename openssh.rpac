@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# Overloaded variables:
+PKG="openssh"
+VER="7.1p1"
+URL="http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/$PKG-$VER.tar.gz"
+DESCRIPTION="The OpenSSH package contains ssh clients and the sshd daemon."
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	./configure --prefix=/usr  \
+	--sysconfdir=/etc/ssh \
+	--with-md5-passwords \
+	--with-privsep-path=/var/lib/sshd &&
+	make $GLOBAL_CFLAGS $CFLAGS
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to temporary folder"
+	cd $SRC_DIR/$PKG-$VER
+
+	make DESTDIR="$FAKEROOT" install
+
+	install -d $FAKEROOT/usr/bin
+	install -d $FAKEROOT/usr/share/man/man1
+
+	install -v -m755 contrib/ssh-copy-id $FAKEROOT/usr/bin
+	install -v -m644 contrib/ssh-copy-id.1 $FAKEROOT/usr/share/man/man1
+
+	install -v -m755 -d $FAKEROOT/usr/share/doc/$PKG-$VER
+	install -v -m644 INSTALL LICENCE OVERVIEW README* "$FAKEROOT/usr/share/doc/$PKG-$VER"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	logMessage "Deleting temporary $PKG folder"
+	rm -rf $PKG-$VER
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	logMessage "Adding directory /var/lib/sshd"
+	install -v -m700 -d /var/lib/sshd &&
+	chown -v root:sys /var/lib/sshd
+
+	
+	logMessage "Adding group and user for sshd"
+	groupadd -g 50 sshd &&
+	useradd -c 'sshd PrivSep' \
+		-d /var/lib/sshd \
+		-g sshd		\
+		-s /bin/false \
+		-u 50 sshd
+	
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
+
+postremovePackage() {
+	logMessage "PostRemove $PKG"
+	logMessage "Removing directory /var/lib/sshd"
+	rm -r /var/lib/sshd
+
+	logMessage "Removing group and user for sshd"
+	groupdel sshd
+	userdel sshd
+
+	logMessage "Removing $PKG from index"
+	rm -v $PKG_INDEX/$PKG-$VER
+	return
+}
