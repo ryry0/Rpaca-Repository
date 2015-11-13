@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="winremote-client"
+VER="git"
+URL="https://ryry@bitbucket.org/ryry/winremote-client.git"
+DESCRIPTION="My windows remote keyboard program!"
+CFLAGS="DEFAULT_DEBUG=n"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	git clone $URL $PKG-$VER
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source not necessary"
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	make $GLOBAL_CFLAGS $CFLAGS
+}
+
+cleanSource() {
+	logMessage "Cleaning $PKG source"
+	cd $SRC_DIR/$PKG-$VER
+	make clean
+}
+
+# Run make check on package
+checkSource() {
+	logMessage "Checking $PKG not necessary"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+
+	install -d $FAKEROOT/usr/bin
+	install -m755 winremote.x $FAKEROOT/usr/bin
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+deleteDownload() {
+	logMessage "Deleting $PKG source archive not necessary"
+}

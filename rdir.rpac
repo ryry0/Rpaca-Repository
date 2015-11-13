@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="rdir"
+VER="git"
+URL="https://ryry@bitbucket.org/ryry/rdir.git"
+DESCRIPTION="My directory changing program!"
+CFLAGS="DEFAULT_DEBUG=n"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+#ncurses
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	git clone $URL $PKG-$VER
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source not necessary"
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	make $GLOBAL_CFLAGS $CFLAGS
+}
+
+cleanSource() {
+	logMessage "Cleaning $PKG source"
+	cd $SRC_DIR/$PKG-$VER
+	make clean
+}
+
+# Run make check on package
+checkSource() {
+	logMessage "Checking $PKG not necessary"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+
+	install -d $FAKEROOT/usr/bin
+	install -m755 rdir.x $FAKEROOT/usr/bin
+	install -m755 rdir.sh $FAKEROOT/usr/bin
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	echo "Source /bin/rdir.sh to get rdir bash bindings"
+
+	cd $FAKEROOT
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
+
+deleteDownload() {
+	logMessage "Deleting $PKG source archive not necessary"
+}
