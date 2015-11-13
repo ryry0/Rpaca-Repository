@@ -16,7 +16,7 @@ DEPS=""
 downloadSource() {
 	cd $SRC_DIR
 	logMessage "Downloading $PKG"
-	git clone $URL $PKG-$VER
+	git clone $URL $PKG-$VER || die "Cloning $PKG failed"
 }
 
 extractSource() {
@@ -47,7 +47,7 @@ buildPackage() {
 	cd $SRC_DIR/$PKG-$VER
 
 	install -d $FAKEROOT/usr/bin
-	install -m755 winremote.x $FAKEROOT/usr/bin
+	install -m755 winremote.x $FAKEROOT/usr/bin || die "$PKG failed building"
 
 	cd $PKG_DIR
 	logMessage "Tarring and compressing $PKG"

@@ -16,6 +16,9 @@ DEPS=""
 compileSource() {
 	cd $SRC_DIR/$PKG-$VER
 	logMessage "Compiling $PKG"
-	./configure --prefix=/usr --sysconfdir=/etc --disable-static &&
-	make $GLOBAL_CFLAGS $CFLAGS
+
+	./configure --prefix=/usr --sysconfdir=/etc --disable-static ||
+	die "Configure $PKG source failed"
+
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
 }
