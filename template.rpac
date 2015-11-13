@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
 # Overloaded variables:
 PKG=""
 VER=""
@@ -17,26 +18,26 @@ DEPS=""
 downloadSource() {
 	cd $SRC_DIR
 	logMessage "Downloading $PKG"
-	curl -O $URL
+	curl -O $URL || die "Downloading $PKG failed"
 }
 
 extractSource() {
 	cd $SRC_DIR
 	logMessage "Extracting $PKG source"
-	tar -xvf $PKG-$VER.tar.gz
+	tar -xvf $PKG-$VER.tar.gz || die "Extracting $PKG source failed"
 }
 
 compileSource() {
 	cd $SRC_DIR/$PKG-$VER
 	logMessage "Compiling $PKG"
-	./configure --prefix=/usr &&
-	make $GLOBAL_CFLAGS $CFLAGS
+	./configure --prefix=/usr || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
 }
 
 cleanSource() {
 	logMessage "Cleaning $PKG source"
 	cd $SRC_DIR/$PKG-$VER
-	make clean
+	make clean || die "Cleaning $PKG source failed"
 }
 
 # Run make check on package
@@ -50,7 +51,7 @@ checkSource() {
 buildPackage() {
 	logMessage "Building $PKG to fakeroot"
 	cd $SRC_DIR/$PKG-$VER
-	make DESTDIR="$FAKEROOT" install
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
 	cd $PKG_DIR
 	logMessage "Tarring and compressing $PKG"
 	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
@@ -62,27 +63,25 @@ preinstallPackage() {
 	logMessage "PreInstall $PKG"
 	cd $PKG_DIR
 	logMessage "Extracting $PKG package"
-	tar -xvzf $PKG-$VER.tar.gz
+	tar -xvzf $PKG-$VER.tar.gz || die "$PKG package extraction failed"
 	cd $FAKEROOT
-	return
+	return $?
 }
 
 # install the program from the standalone package
 installPackage() {
 	logMessage "Installing $PKG"
 	logMessage "CDing to $PKG fakeroot"
-	cd $FAKEROOT
+	cd $FAKEROOT || die "$PKG fakeroot does not exist"
 
 	logMessage "Creating $PKG directories"
 	for dir in $(find . -type d | sed -e 's@./@@'); do
-		install -dv /${dir}
-		#echo creating /${dir}
+		install -dv /${dir} || die "Creating ${dir} for $PKG failed"
 	done
 
 	logMessage "Copying $PKG files"
 	for file in $(find . ! -type d | sed -e 's@./@@'); do
-		#echo ${file} " -> " /${file}
-		cp -dpf ${file} /${file}
+		cp -dpf ${file} /${file} || die "Creating ${dir} for $PKG failed"
 	done
 }
 
@@ -108,14 +107,17 @@ preremovePackage() {
 removePackage() {
 	logMessage "Removing $PKG"
 	cd $PKG_INDEX
+	# go through all files before deleting anything
 	for file in $( cat $PKG_INDEX/$PKG-$VER ); do
 		#finds packages that need the same file
 		if grep -qlr "^$file$" --exclude=$PKG-$VER
 		then
-			echo $file needed by $(grep -lr "^$file$" --exclude=$PKG-$VER)
-		else
-			rm -fv $file
+			die "$file needed by $(grep -lr "^$file$" --exclude=$PKG-$VER)"
 		fi
+	done
+
+	for file in $( cat $PKG_INDEX/$PKG-$VER ); do
+			rm -fv $file
 	done
 	return
 }
@@ -138,6 +140,6 @@ deleteDownload() {
 }
 
 deletePackage() {
-	logMessage "Deleting $PKG source archive"
+	logMessage "Deleting $PKG built package"
 	rm -rfv $PKG_DIR/$PKG-$VER.tar.gz
 }
