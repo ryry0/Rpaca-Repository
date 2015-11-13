@@ -69,6 +69,7 @@ TODO:
 
 (base installation)
 
+Graphics
 * X
 * xorg-backlight
 * xorg-synaptics
@@ -82,6 +83,7 @@ TODO:
 * wicd
 * xclip
 
+Programming
 * zsh
 * avrgcc
 * gdb
@@ -95,11 +97,13 @@ TODO:
 * sudo
 * 7zip
 * tlp
- 
+
+Scientific Computing
 * Julia
-* Latex?
+* Latex
 * gnuplot
 
+Other
 * redshift
 * syncthing
 * mplayer
