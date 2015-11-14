@@ -86,14 +86,14 @@ Graphics
 
 Programming
 
-* zsh
+* ~~zsh~~
 * avrgcc
 * gdb
 * ctags
 * valgrind
 * strace
 * ~~git~~
-* tmux
+* ~~tmux~~
 * ~~openssh~~
 * inetutils - telnet
 * sudo
