@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="zsh"
+VER="5.1.1"
+URL="http://www.zsh.org/pub/$PKG-$VER.tar.xz"
+DESCRIPTION="The zsh package contains a command interpreter usable as an interactive login shell."
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.tar.xz || die "Extracting $PKG source failed"
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	./configure --prefix=/usr \
+		--bindir=/bin \
+		--sysconfdir=/etc/zsh \
+		--enable-etcdir=/etc/zsh || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+	# makeinfo Doc/zsh.texi --plaintext -o/zsh.txt &&
+	# makeinfo Doc/zsh.texi --htlp -o Doc/html &&
+	# makeinfo Doc/zsh.texi --html --no-split --no-headers -o Doc/zsh.html ||
+	# die "Making $PKG docs failed"
+}
+
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+	make DESTDIR="$FAKEROOT" infodir=/usr/share/info install.info || die "$PKG make install.info failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
