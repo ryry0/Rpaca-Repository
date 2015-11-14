@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="tmux"
+VER="git"
+URL="https://github.com/tmux/tmux.git"
+DESCRIPTION="Tmux is a terminal multiplexer."
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libevent"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	git clone $URL $PKG-$VER || die "Cloning $PKG failed"
+}
+
+extractSource() {
+	logMessage "Extracting $PKG source not necessary"
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	sh autogen.sh || die "Autogen $PKG failed"
+	./configure --prefix=/usr || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+deleteDownload() {
+	logMessage "Deleting $PKG source archive not necessary"
+}
+
