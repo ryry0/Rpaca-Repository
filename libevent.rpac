@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libevent"
+VER="2.0.22"
+URL="http://superb-dca2.dl.sourceforge.net/project/levent/libevent/libevent-2.0/libevent-2.0.22-stable.tar.gz"
+DESCRIPTION="Libevent is an asynchronous event notification software library."
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="openssl"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER-stable.tar.gz || die "Extracting $PKG source failed"
+	mv $PKG-$VER-stable $PKG-$VER
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	./configure --prefix=/usr --disable-static || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+deleteDownload() {
+	logMessage "Deleting $PKG source archive"
+	rm -rfv $SRC_DIR/$PKG-$VER-stable.tar.gz
+}
