@@ -70,6 +70,7 @@ TODO:
 (base installation)
 
 Graphics
+
 * X
 * xorg-backlight
 * xorg-synaptics
@@ -84,6 +85,7 @@ Graphics
 * xclip
 
 Programming
+
 * zsh
 * avrgcc
 * gdb
@@ -99,11 +101,13 @@ Programming
 * tlp
 
 Scientific Computing
+
 * Julia
 * Latex
 * gnuplot
 
 Other
+
 * redshift
 * syncthing
 * mplayer
