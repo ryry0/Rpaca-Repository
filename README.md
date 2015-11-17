@@ -96,7 +96,7 @@ Programming
 * ~~tmux~~
 * ~~openssh~~
 * inetutils - telnet
-* sudo
+* ~~sudo~~
 * 7zip
 * tlp
 
