@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="inputproto"
+VER="2.3.1"
+EXT="tar.gz" # extension of download
+DESCRIPTION="Part of the Xorg Headers meta package"
+CFLAGS=""
+URL="http://ftp.x.org/pub/individual/proto/$PKG-$VER.$EXT"
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="util-macros"

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
+# Overloaded variables:
+PKG="util-macros"
+VER="1.19.0"
+URL="http://ftp.x.org/pub/individual/util/$PKG-$VER.tar.gz"
+DESCRIPTION="This package contains the m4 macros used by all fo the Xorg packages"
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""

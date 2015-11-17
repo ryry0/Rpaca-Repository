@@ -1,0 +1,111 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="xorg-headers"
+VER="7.7"
+URL=""
+DESCRIPTION="The Xorg protocol headers provide the header files required to build the system"
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+XORG_PREFIX=/usr
+XORG_CONFIG="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+XORG_HEADERS="bigreqsproto compositeproto damageproto dmxproto dri2proto dri3proto 
+fixesproto fontsproto glproto inputproto kbproto presentproto randrproto recordproto
+renderproto resourceproto scrnsaverproto videoproto xcmiscproto xextproto
+xf86bigfontproto xf86dgaproto xf86driproto xf86vidmodeproto xineramaproto xproto"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	for i in $XORG_HEADERS
+	do
+		rpaca -d $i
+	done
+}
+
+extractSource() {
+	for i in $XORG_HEADERS
+	do
+		rpaca -e $i
+	done
+}
+
+compileSource() {
+	for i in $XORG_HEADERS
+	do
+		rpaca -c $i
+	done
+}
+
+cleanSource() {
+	return
+}
+
+# Run make check on package
+checkSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	for i in $XORG_HEADERS
+	do
+		rpaca -b $i
+	done
+}
+
+preinstallPackage() {
+	return
+}
+
+# install the program from the standalone package
+installPackage() {
+	for i in $XORG_HEADERS
+	do
+		rpaca -i $i
+	done
+}
+
+# records the files installed
+postinstallPackage() {
+	return
+}
+
+preremovePackage() {
+	return
+}
+
+removePackage() {
+	for i in $XORG_HEADERS
+	do
+		rpaca -r $i
+	done
+}
+
+postremovePackage() {
+	return
+}
+
+deleteSource() {
+	for i in $XORG_HEADERS
+	do
+		rpaca --delete-source $i
+	done
+}
+
+deleteDownload() {
+	for i in $XORG_HEADERS
+	do
+		rpaca --delete-download $i
+	done
+}
+
+deletePackage() {
+	for i in $XORG_HEADERS
+	do
+		rpaca --delete-package $i
+	done
+}
