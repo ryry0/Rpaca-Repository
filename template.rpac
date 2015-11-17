@@ -5,6 +5,7 @@
 # Overloaded variables:
 PKG=""
 VER=""
+EXT="tar.gz" # extension of download
 URL=""
 DESCRIPTION=""
 CFLAGS=""
@@ -25,7 +26,7 @@ downloadSource() {
 extractSource() {
 	cd $SRC_DIR
 	logMessage "Extracting $PKG source"
-	tar -xvf $PKG-$VER.tar.gz || die "Extracting $PKG source failed"
+	tar -xvf $PKG-$VER.$EXT || die "Extracting $PKG source failed"
 }
 
 compileSource() {
@@ -137,7 +138,7 @@ deleteSource() {
 
 deleteDownload() {
 	logMessage "Deleting $PKG source archive"
-	rm -rfv $SRC_DIR/$PKG-$VER.tar.gz
+	rm -rfv $SRC_DIR/$PKG-$VER.$EXT
 }
 
 deletePackage() {
