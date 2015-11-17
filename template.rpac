@@ -8,6 +8,7 @@ VER=""
 URL=""
 DESCRIPTION=""
 CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
 FAKEROOT=$PKG_DIR/$PKG-$VER
 DEPS=""
 
@@ -30,7 +31,7 @@ extractSource() {
 compileSource() {
 	cd $SRC_DIR/$PKG-$VER
 	logMessage "Compiling $PKG"
-	./configure --prefix=/usr || die "Configure $PKG source failed"
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
 	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
 }
 
