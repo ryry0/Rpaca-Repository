@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
+# Overloaded variables:
+PKG="sudo"
+VER="1.8.14p3"
+URL="http://www.sudo.ws/dist/$PKG-$VER.tar.gz"
+DESCRIPTION="The sudo package allows a system administrator 
+to give certain users the ability to run some commands as root"
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+
+	./configure --prefix=/usr --libexecdir=/usr/lib --with-secure-path \
+	--with-all-insults --with-env-editor --docdir=/usr/share/doc/$PKG-$VER \
+	--with-passprompt="[sudo] password for %p" || die "Configure $PKG source failed"
+
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
