@@ -7,6 +7,6 @@ URL="curl.haxx.se/download/$PKG-$VER.tar.gz"
 DESCRIPTION="The cURL package contains a utility and library used for transferring files.\
 to any of the following protocols: FTP, HTTP, HTTPS, SFTP, and more."
 CFLAGS=""
-CONF_FLAGS="--prefix=/usr"
+CONF_FLAGS="--prefix=/usr --with-ca-bundle=/etc/ssl/ca-bundle.crt"
 FAKEROOT=$PKG_DIR/$PKG-$VER
-DEPS="openssl"
+DEPS="openssl ca-certificates"
