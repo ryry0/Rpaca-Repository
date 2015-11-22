@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="freetype"
+VER="2.6"
+EXT="tar.gz" # extension of download
+URL="http://downloads.sourceforge.net/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The FreeType2 package contains a library which allows applications to properly render TrueType fonts."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+
+	sed -i -e "/AUX.*.gxvalid/s@^# @@" -e "/AUX.*.otvalid/s@^# @@" modules.cfg ||
+	die "Sed modules.cfg failed"
+
+	sed -ri -e 's:.*(#.*SUBPIXEL.*) .*:\1:' include/config/ftoption.h ||
+	die "Sed ftoption.h failed"
+
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+	install -v -m755 -d $FAKEROOT/usr/share/doc/$PKG-$VER || die "Creating docdir failed"
+	cp -v -R docs/*	$FAKEROOT/usr/share/doc/$PKG-$VER || die "Copying docs failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
