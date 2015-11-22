@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libXtst"
+VER="1.2.2"
+EXT="tar.gz" # extension of download
+DESCRIPTION="Part of the Xorg Libraries meta package"
+CFLAGS=""
+URL="http://ftp.x.org/pub/individual/lib/$PKG-$VER.$EXT"
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="fontconfig libxcb"

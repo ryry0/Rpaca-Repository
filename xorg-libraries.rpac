@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="xorg-libraries"
+VER="7.7"
+URL=""
+DESCRIPTION="The Xorg libraries provide library routines that are used within all X window applications."
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="fontconfig libxcb"
+XORG_PREFIX=/usr
+XORG_CONFIG="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+XORG_LIBRARIES="xtrans libx11 libxext libfs libice libsm libxscrnsaver libxt libxmu libxpm 
+libxaw libxfixes libxcomposite libxrender libxcursor libxdamage libfontenc 
+libxfont libxft libxi libxinerama libxrandr libxres libxtst libxv libxvmc 
+libxxf86dga libxxf86vm libdmx libpciaccess libxkbfile libxshmfence"
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca -d $i
+	done
+}
+
+extractSource() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca -e $i
+	done
+}
+
+compileSource() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca -c $i
+	done
+}
+
+cleanSource() {
+	return
+}
+
+# Run make check on package
+checkSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca -b $i
+	done
+}
+
+preinstallPackage() {
+	return
+}
+
+# install the program from the standalone package
+installPackage() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca -i $i
+	done
+}
+
+# records the files installed
+postinstallPackage() {
+	return
+}
+
+preremovePackage() {
+	return
+}
+
+removePackage() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca -r $i
+	done
+}
+
+postremovePackage() {
+	return
+}
+
+deleteSource() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca --delete-source $i
+	done
+}
+
+deleteDownload() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca --delete-download $i
+	done
+}
+
+deletePackage() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca --delete-package $i
+	done
+}
