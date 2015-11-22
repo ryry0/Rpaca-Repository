@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="xcb-util-image"
+VER="0.4.0"
+EXT="tar.gz" # extension of download
+URL="http://xcb.freedesktop.org/dist/$PKG-$VER.$EXT"
+DESCRIPTION="The xcb-util-image package provides additional extensions to the XCB library."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xcb-util"
