@@ -20,7 +20,7 @@ DEPS=""
 downloadSource() {
 	cd $SRC_DIR
 	logMessage "Downloading $PKG"
-	curl -O $URL || die "Downloading $PKG failed"
+	curl -L -O $URL || die "Downloading $PKG failed"
 }
 
 extractSource() {
@@ -83,7 +83,7 @@ installPackage() {
 
 	logMessage "Copying $PKG files"
 	for file in $(find . ! -type d | sed -e 's@./@@'); do
-		cp -dpf ${file} /${file} || die "Creating ${dir} for $PKG failed"
+		cp -dpf "${file}" "/${file}" || die "Creating ${dir} for $PKG failed"
 	done
 }
 
