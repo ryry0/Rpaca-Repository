@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="xcb-proto"
+VER="1.11"
+EXT="tar.gz" # extension of download
+DESCRIPTION="The xcb-proto package provides the XML-XCB protocol descriptions that libxcb uses to generate
+the majority of its code and API."
+CFLAGS=""
+URL="http://xcb.freedesktop.org/dist/$PKG-$VER.$EXT"
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="util-macros xorg-headers python"
