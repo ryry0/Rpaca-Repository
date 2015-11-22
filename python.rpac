@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="Python"
+VER="3.4.3"
+EXT="tar.xz" # extension of download
+URL="https://www.python.org/ftp/python/$VER/$PKG-$VER.$EXT"
+DESCRIPTION="The Python 3 package contains the Python development environment."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --enable-shared --with-system-expat --with-system-ffi --without-ensurepip"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libffi expat"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	CXX="/usr/bin/g++"
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# install the program from the standalone package
+installPackage() {
+	logMessage "Installing $PKG"
+	logMessage "CDing to $PKG fakeroot"
+	cd $FAKEROOT || die "$PKG fakeroot does not exist"
+	logMessage "Changing \$IFS"
+	SAVEIFS=$IFS
+	IFS=$(echo -en "\n\b") # fixes error with spaces in a file name
+
+	logMessage "Creating $PKG directories"
+	for dir in $(find . -type d | sed -e 's@./@@'); do
+		install -dv /${dir} || die "Creating ${dir} for $PKG failed"
+	done
+
+	logMessage "Copying $PKG files"
+	for file in $(find . ! -type d | sed -e 's@./@@'); do
+		cp -dpf "${file}" "/${file}" || die "Creating ${dir} for $PKG failed"
+	done
+	logMessage "Reverting \$IFS"
+	IFS=$SAVEIFS
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	chmod -v 755 /usr/lib/libpython3.4m.so || die "Changing mode of libpython3.4m.so failed"
+	chmod -v 755 /usr/lib/libpython3.so || die "Changing mode of libpython3 libpython failed"
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
