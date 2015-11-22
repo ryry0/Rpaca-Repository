@@ -56,7 +56,7 @@ buildPackage() {
 	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
 	cd $PKG_DIR
 	logMessage "Tarring and compressing $PKG"
-	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
 	logMessage "Deleting $PKG fakeroot"
 	rm -rf $PKG-$VER
 }
