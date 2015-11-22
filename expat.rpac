@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
+# Overloaded variables:
+PKG="expat"
+VER="2.1.0"
+EXT="tar.gz" # extension of download
+URL="http://downloads.sourceforge.net/project/expat/expat/2.1.0/expat-2.1.0.tar.gz"
+DESCRIPTION="The Expat package contains a steram oriented C libarary for parsing XML."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+	install -v -m755 -d $FAKEROOT/usr/share/doc/$PKG-$VER &&
+	install -v -m644 doc/*.{html,png,css} $FAKEROOT/usr/share/doc/$PKG-$VER ||
+	die "Building $PKG docs failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
