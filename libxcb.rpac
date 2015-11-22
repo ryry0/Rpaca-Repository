@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libxcb"
+VER="1.11.1"
+EXT="tar.gz" # extension of download
+URL="http://xcb.freedesktop.org/dist/$PKG-$VER.$EXT"
+DESCRIPTION="The libxcb package provides an interface to the X Window System protocol, which replaces the current Xlib interface."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libxau xcb-proto libxdmcp"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	sed -i "s/pthread-stubs//" configure || die "Removing dependency on pthread-stubs failed"
+	logMessage "Compiling $PKG"
+	./configure $CONF_FLAGS --enable-xinput --without-doxygen --docdir='${datadir}'/doc/$PKG-$VER || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
