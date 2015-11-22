@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="fontconfig"
+VER="2.11.1"
+EXT="tar.gz" # extension of download
+URL="http://www.freedesktop.org/software/$PKG/release/$PKG-$VER.$EXT"
+DESCRIPTION="The Fontconfig package contains a library and support programs used for configuring and customizing font access."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-docs --docdir=/usr/share/doc/$PKG-$VER"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="freetype"
