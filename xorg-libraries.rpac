@@ -19,24 +19,15 @@ libxxf86dga libxxf86vm libdmx libpciaccess libxkbfile libxshmfence"
 
 # Dl package
 downloadSource() {
-	for i in $XORG_LIBRARIES
-	do
-		rpaca -d $i
-	done
+	return
 }
 
 extractSource() {
-	for i in $XORG_LIBRARIES
-	do
-		rpaca -e $i
-	done
+	return
 }
 
 compileSource() {
-	for i in $XORG_LIBRARIES
-	do
-		rpaca -c $i
-	done
+	return
 }
 
 cleanSource() {
@@ -50,10 +41,7 @@ checkSource() {
 
 # Take compiled files and make them into a standalone package
 buildPackage() {
-	for i in $XORG_LIBRARIES
-	do
-		rpaca -b $i
-	done
+	return
 }
 
 preinstallPackage() {
@@ -64,7 +52,7 @@ preinstallPackage() {
 installPackage() {
 	for i in $XORG_LIBRARIES
 	do
-		rpaca -i $i
+		rpaca -S $i
 	done
 }
 
