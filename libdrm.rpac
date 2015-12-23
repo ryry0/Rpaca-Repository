@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libdrm"
+VER="2.4.64"
+EXT="tar.gz" # extension of download
+URL="http://dri.freedesktop.org/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="libdrm provides a user space library for accessing the DRM, direct rendering manager, on OSes that support the ioctl interface."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --enable-udev --disable-valgrind"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xorg-libraries"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	sed -e "/pthread-stubs/d" -i configure.ac &&
+	autoreconf -fiv || die "Sed and Autoreconf $PKG source failed"
+
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
