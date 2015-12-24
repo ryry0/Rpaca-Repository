@@ -1,0 +1,100 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="xorg-applications"
+VER="7.7"
+URL=""
+DESCRIPTION="The xorg applications provide the expected applications available in previous X Window implementations."
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="fontconfig libxcb"
+XORG_PREFIX=/usr
+XORG_CONFIG="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+XORG_LIBRARIES="bdftopcf iceauth luit mkfontdir mkfontscale sessreg 
+setxkbmap smproxy x11perf xauth xbacklight xcmsdb xcursorgen xdpyinfo xdriinfo 
+xev xgamma xhost xinput xkbcomp xkbevd xkbutils xkill xlsatoms xlsclients 
+xmessage xmodmap xpr xprop xrandr xrdb xrefresh xset xsetroot xvinfo xwd xwininfo xwud"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	return
+}
+
+extractSource() {
+	return
+}
+
+compileSource() {
+	return
+}
+
+cleanSource() {
+	return
+}
+
+# Run make check on package
+checkSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	return
+}
+
+preinstallPackage() {
+	return
+}
+
+# install the program from the standalone package
+installPackage() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca -S $i
+	done
+}
+
+# records the files installed
+postinstallPackage() {
+	rm -f $XORG_PREFIX/bin/xkeystone
+	return
+}
+
+preremovePackage() {
+	return
+}
+
+removePackage() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca -r $i
+	done
+}
+
+postremovePackage() {
+	return
+}
+
+deleteSource() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca --delete-source $i
+	done
+}
+
+deleteDownload() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca --delete-download $i
+	done
+}
+
+deletePackage() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca --delete-package $i
+	done
+}

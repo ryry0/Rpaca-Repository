@@ -1,0 +1,36 @@
+#!/bin/bash
+# may need to install elfutils, libvdpau (for NVIDIA), and LLVM-3.7 for radeon drivers
+
+# Overloaded variables:
+PKG="mesa"
+VER="10.6.6"
+EXT="tar.xz" # extension of download
+URL="ftp://ftp.freedesktop.org/pub/$PKG/older-versions/10.x/$VER/$PKG-$VER.$EXT"
+DESCRIPTION="Mesa is an OpenGL compatible 3D graphics library."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xorg-libraries libdrm"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+
+	./autogen.sh CFLAGS='-O2' CXXFLAGS='-O2' \
+	--prefix=/usr \
+	--sysconfdir=/etc \
+	--enable-texture-float \
+	--enable-gles1 \
+	--enable-gles2 \
+	--enable-osmesa \
+	--enable-xa \
+	--enable-gbm \
+	--enable-glx-tls \
+	--with-egl-platforms="drm,x11" \
+	--with-gallium-drivers="svga,swrast" || die "Autogen $PKG source failed" \
+	#--with-gallium-drivers="nouveau,r300,r600,radeonsi,svga,swrast"
+
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}

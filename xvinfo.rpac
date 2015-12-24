@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="xvinfo"
+VER="1.1.3"
+EXT="tar.gz" # extension of download
+DESCRIPTION="Part of the Xorg Applications meta package"
+CFLAGS=""
+URL="http://ftp.x.org/pub/individual/app/$PKG-$VER.$EXT"
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libpng mesalib xbitmaps xcb-util"
