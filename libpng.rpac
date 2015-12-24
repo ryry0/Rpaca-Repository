@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libpng"
+VER="1.6.18"
+EXT="tar.gz" # extension of download
+URL="http://downloads.sourceforge.net/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The libpng package contains liubraries used by other programs for reading and writing PNG files."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	curl -L -O $URL || die "Downloading $PKG failed"
+	curl -L -O "http://downloads.sourceforge.net/$PKG-apng/$PKG-$VER-apng.patch.gz" || die "Downloading $PKG patch failed"
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	gzip -cd ../$PKG-$VER-apng.patch.gz | patch -p1 || die "Patching $PKG source failed"
+
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
