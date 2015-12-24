@@ -20,7 +20,7 @@ DEPS="xorg-server"
 downloadSource() {
 	cd $SRC_DIR
 	logMessage "Downloading $PKG"
-	git clone $URL $PKG-$VER
+	git clone $URL $PKG-$VER || die "Cloning $PKG source failed"
 }
 
 extractSource() {
