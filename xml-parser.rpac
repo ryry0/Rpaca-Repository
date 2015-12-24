@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="XML-Parser"
+VER="2.41"
+EXT="tar.gz" # extension of download
+URL="http://search.cpan.org/CPAN/authors/id/T/TO/TODDR/$PKG-$VER.$EXT"
+DESCRIPTION="This is a perl extension interface to expat."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="perl"
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+
+	perl Makefile.PL &&
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
