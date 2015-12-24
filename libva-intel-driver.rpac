@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
+# Overloaded variables:
+PKG="libva-intel-driver"
+VER="1.6.0"
+EXT="tar.bz2" # extension of download
+URL="http://www.freedesktop.org/software/vaapi/releases/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The libva package contains a library which provides access to hardware accelerated video processing."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="mesalib libva"
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+
+	mkdir -p m4 &&
+	autoreconf -fi &&
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
