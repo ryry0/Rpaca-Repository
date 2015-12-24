@@ -3,7 +3,7 @@
 # Overloaded variables:
 PKG="linux"
 VER="3.14.21"
-URL=""
+URL="https://www.kernel.org/pub/$PKG/kernel/v3.x/$PKG-$VER.tar.gz"
 DESCRIPTION="The Linux Kernel."
 CFLAGS=""
 FAKEROOT=$PKG_DIR/$PKG-$VER
@@ -16,11 +16,9 @@ compileSource() {
 	cd $SRC_DIR/$PKG-$VER
 	logMessage "Compiling $PKG"
 
-	#logMessage "patching linux"
-	#xzcat ../patch-3.14.21.xz | patch -Np1 -i -
-	#make mrproper
-	#logMessage "Copying previous configuration"
-	#cp -v /boot/config-$VER .
+	make mrproper
+	logMessage "Copying previous kernel configuration"
+	cp -v /boot/config-$VER .config
 
 	logMessage "Making configuration"
 	#make defconfig
