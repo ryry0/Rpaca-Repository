@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
+# Overloaded variables:
+PKG="libevdev"
+VER="1.4.4"
+EXT="tar.xz" # extension of download
+URL="http://www.freedesktop.org/software/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The libevdev package contains common functions for xorg input drivers."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="python"
