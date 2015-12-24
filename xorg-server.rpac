@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="xorg-server"
+VER="1.17.2"
+EXT="tar.gz" # extension of download
+URL="http://ftp.x.org/pub/individual/xserver/$PKG-$VER.$EXT"
+DESCRIPTION="The xorg server is the core of the x window system."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static
+--enable-glamor --enable-install-setuid --enable-suid-wrapper --disable-systemd-logind
+--with-xkb-output=/var/lib/xkb"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="openssl pixman xorg-fonts xkeyboard-config"
+
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+	
+	mkdir -pv /etc/X11/xorg.conf.d &&
+
+cat > /etc/sysconfig/createfiles << "EOF"
+/tmp/.ICE-unix dir 1777 root root
+/tmp/.X11-unix dir 1777 root root
+EOF
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
