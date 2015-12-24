@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
+# Overloaded variables:
+PKG="xcursor-themes"
+VER="1.0.4"
+EXT="tar.gz" # extension of download
+URL="http://ftp.x.org/pub/individual/data/$PKG-$VER.$EXT"
+DESCRIPTION="The xcursor-themes package contains the redglass and whiteclass animated cursor themes."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xorg-applications"
