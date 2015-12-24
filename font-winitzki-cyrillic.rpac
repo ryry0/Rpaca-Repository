@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="font-winitzki-cyrillic"
+VER="1.0.3"
+EXT="tar.gz" # extension of download
+DESCRIPTION="Part of the Xorg Fonts meta package"
+CFLAGS=""
+URL="http://ftp.x.org/pub/individual/font/$PKG-$VER.$EXT"
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xcursor-themes"

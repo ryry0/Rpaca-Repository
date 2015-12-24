@@ -1,0 +1,106 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="xorg-fonts"
+VER="7.7"
+URL=""
+DESCRIPTION="The Xorg font packages provide needed fonts to the xorg applications."
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xcursor-themes"
+XORG_PREFIX=/usr
+XORG_CONFIG="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+XORG_LIBRARIES="font-util encodings font-adobe-100dpi font-adobe-75dpi font-adobe-utopia-100dpi
+font-adobe-utopia-75dpi font-adobe-utopia-type1 font-alias font-arabic-misc font-bh-100dpi
+font-bh-75dpi font-bh-lucidatypewriter-100dpi font-bh-lucidatypewriter-75dpi font-bh-ttf font-bh-type1
+font-bitstream-100dpi font-bitstream-75dpi font-bitstream-type1 font-cronyx-cyrillic font-cursor-misc
+font-daewoo-misc font-dec-misc font-ibm-type1 font-isas-misc font-jis-misc font-micro-misc font-misc-cyrillic
+font-misc-ethiopic font-misc-meltho font-misc-misc font-mutt-misc font-schumacher-misc font-screen-cyrillic
+font-sony-misc font-sun-misc font-winitzki-cyrillic font-xfree86-type1"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	return
+}
+
+extractSource() {
+	return
+}
+
+compileSource() {
+	return
+}
+
+cleanSource() {
+	return
+}
+
+# Run make check on package
+checkSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	return
+}
+
+preinstallPackage() {
+	return
+}
+
+# install the program from the standalone package
+installPackage() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca -S $i
+	done
+}
+
+# records the files installed
+postinstallPackage() {
+	install -v -d -m755 /usr/share/fonts && 
+	ln -svfn $XORG_PREFIX/share/fonts/X11/OTF /usr/share/fonts/X11-OTF &&
+	ln -svfn $XORG_PREFIX/share/fonts/X11/TTF /usr/share/fonts/X11-TTF ||
+	die "PostInstall $PKG failed"
+	return
+}
+
+preremovePackage() {
+	return
+}
+
+removePackage() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca -r $i
+	done
+}
+
+postremovePackage() {
+	return
+}
+
+deleteSource() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca --delete-source $i
+	done
+}
+
+deleteDownload() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca --delete-download $i
+	done
+}
+
+deletePackage() {
+	for i in $XORG_LIBRARIES
+	do
+		rpaca --delete-package $i
+	done
+}
