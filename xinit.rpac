@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
+# Overloaded variables:
+PKG="xinit"
+VER="1.3.4"
+EXT="tar.bz2" # extension of download
+URL="http://ftp.x.org/pub/individual/app/$PKG-$VER.$EXT"
+DESCRIPTION="The xinit package contains a usable script to start the xserver."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static --with-xinitdir=/etc/X11/app-defaults"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xorg-server"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+
+	sed -e '/$serverargs $vtarg/ s/serverargs/: #&/' -i startx.cpp || die "Sed $PKG source failed"
+
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	ldconfig || die "$PKG ldconfig failed"
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
+
+postremovePackage() {
+	logMessage "PostRemove $PKG"
+
+	ldconfig || die "$PKG ldconfig failed"
+
+	logMessage "Removing $PKG from index"
+	rm -v $PKG_INDEX/$PKG-$VER
+	return
+}
