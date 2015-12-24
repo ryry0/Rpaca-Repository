@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
+# Overloaded variables:
+PKG="xkeyboard-config"
+VER="2.15"
+EXT="tar.gz" # extension of download
+URL="http://ftp.x.org/pub/individual/data/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The XKeyboardConfig packge contains the keyboard configuration database for the X window system."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static --with-xkb-rules-symlink=xorg"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xorg-libraries intltool"
