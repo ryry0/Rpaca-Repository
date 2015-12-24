@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="intltool"
+VER="0.50.2"
+EXT="tar.gz" # extension of download
+URL="http://launchpad.net/$PKG/trunk/$VER/+download/$PKG-$VER.$EXT"
+DESCRIPTION="The intltool is an internationalization tool used for extractin translatable strings from source files."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xml-parser"
