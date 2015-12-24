@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="pciutils"
+VER="3.4.0"
+EXT="tar.xz" # extension of download
+URL="ftp://ftp.kernel.org/pub/software/utils/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The PCI Utils package contains a set of programs for listing PCI devices."
+CFLAGS="PREFIX=/usr SHAREDIR=/usr/share/misc SHARED=yes"
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" $CFLAGS install install-lib || die "$PKG make install failed"
+
+	chmod -v 755 $FAKEROOT/usr/lib/libpci.so || die "Setting permissions for $PKG failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
