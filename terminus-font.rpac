@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="terminus-font"
+VER="4.40"
+EXT="tar.gz" # extension of download
+URL="http://downloads.sourceforge.net/project/$PKG/$PKG-$VER/$PKG-$VER.$EXT"
+DESCRIPTION="Nice font for console."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" install fontdir || die "$PKG make install failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+
+	cd $SRC_DIR/$PKG-$VER
+	make fontdir || die "$PKG make fontdir failed"
+
+	cd $FAKEROOT
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
