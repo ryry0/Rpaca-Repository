@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
+# Overloaded variables:
+PKG="xf86-input-evdev"
+VER="2.9.2"
+EXT="tar.gz" # extension of download
+URL="http://ftp.x.org/pub/individual/driver/$PKG-$VER.$EXT"
+DESCRIPTION="The xorg evdev driver package contains generic linux input drivers for the xorg x server"
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libevdev xorg-server"
