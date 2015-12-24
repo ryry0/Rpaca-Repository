@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="alsa-plugins"
+VER="1.0.29"
+EXT="tar.bz2" # extension of download
+URL="http://alsa.cybermirror.org/plugins/$PKG-$VER.$EXT"
+DESCRIPTION="The ALSA plugins package contains plugins for various audio libraries and sound servers."
+CFLAGS=""
+CONF_FLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="alsa-lib"
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	sed -i "/speex_preprocess.h/i#include <stdint.h>" speex/pcm_speex.c &&
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="alsa-utils"
+VER="1.0.29"
+EXT="tar.bz2" # extension of download
+URL="http://alsa.cybermirror.org/utils/$PKG-$VER.$EXT"
+DESCRIPTION="The ALSA Utilities package contains various utilities which are useful for controlling your sound card."
+CFLAGS=""
+CONF_FLAGS="--disable-alsaconf --disable-xmlto"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="alsa-lib"
