@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
+# Overloaded variables:
+PKG="rxvt-unicode"
+VER="9.21"
+EXT="tar.bz2" # extension of download
+URL="http://dist.schmorp.de/$PKG/Attic/$PKG-$VER.$EXT"
+DESCRIPTION="rxvt-unicode is a clone of the terminal emulator rxvt with support for xft and unicode."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --enable-everything"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xorg-server"
