@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="nspr"
+VER="4.11"
+EXT="tar.gz" # extension of download
+URL="https://ftp.mozilla.org/pub/mozilla.org/$PKG/releases/v$VER/src/$PKG-$VER.$EXT"
+DESCRIPTION="Netscape Portable Runtime provides a platform neutral API for system level and libc like functions."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --with-mozilla --with-pthreads --enable-64bit"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+
+	cd nspr
+
+	sed -ri 's#^(RELEASE_BINS =).*#\1#' pr/src/misc/Makefile.in &&
+	sed -i 's#$(LIBRARY) ##' config/rules.mk || die "Sed $PKG source failed"
+
+	logMessage "Compiling $PKG"
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	cd nspr
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
