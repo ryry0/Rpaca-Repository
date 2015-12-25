@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="glib"
+VER="2.44.1"
+EXT="tar.xz" # extension of download
+URL="http://ftp.gnome.org/pub/gnome/sources/$PKG/2.44/$PKG-$VER.$EXT"
+DESCRIPTION="The Glib package contains low level libraries useful for providing data structure handling for c."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --with-pcre=system --with-python=python3"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libffi python pcre"
