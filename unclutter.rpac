@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="unclutter"
+VER="8"
+EXT="tar.Z" # extension of download
+URL="http://ftp.x.org/contrib/utilities/$PKG-$VER.$EXT"
+DESCRIPTION="Unclutter hides the mouse cursor when not in use."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xorg-server"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.$EXT || die "Extracting $PKG source failed"
+	mv $PKG $PKG-$VER
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	sed -i 's@/usr/bin/X11@/usr/bin@' Makefile || die "Sed $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	install -dv $FAKEROOT/usr/bin
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
