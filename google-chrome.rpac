@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="google-chrome"
+VER="47.0.2526.106"
+EXT="deb" # extension of download
+ARCH="amd64"
+URL="https://dl.google.com/linux/direct/$PKG-stable_current_$ARCH.$EXT"
+DESCRIPTION="An attempt at creating a safer, faster, and more stable browser."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="alsa-lib desktop-file-utils flac gconf gtk2 harfbuzz icu libpng nss opus snappy"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	mkdir $PKG-$VER &&
+	cd $PKG-$VER
+	curl -L -O $URL || die "Downloading $PKG failed"
+}
+
+extractSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Extracting $PKG source"
+	ar vx $PKG-stable_current_$ARCH.$EXT|| die "Extracting .$EXT failed"
+	tar -xvf data.tar.xz || die "Extracting $PKG source failed"
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Removing unnecessary cron jobs"
+	rm -rf etc/cron.daily opt/google/chrome/cron
+}
+
+cleanSource() {
+	return
+}
+
+# Run make check on package
+checkSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+
+	install -d $FAKEROOT/opt
+	cp -r opt $FAKEROOT
+	cp -r usr $FAKEROOT
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
