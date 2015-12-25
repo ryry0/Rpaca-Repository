@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="which"
+VER="2.21"
+EXT="tar.gz" # extension of download
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The GNU which package."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
