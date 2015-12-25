@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="acpi"
+VER="1.6"
+EXT="tar.gz" # extension of download
+URL="http://downloads.sourceforge.net/project/acpiclient/acpiclient/$VER/$PKG-$VER.$EXT"
+DESCRIPTION="Allows reading battery and thermal information."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
