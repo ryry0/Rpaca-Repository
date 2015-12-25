@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="pango"
+VER="1.38.1"
+EXT="tar.xz" # extension of download
+URL="http://ftp.gnome.org/pub/gnome/sources/$PKG/1.38/$PKG-$VER.$EXT"
+DESCRIPTION="Pango is a library for laying out and rendering of text."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="fontconfig freetype harfbuzz glib cairo"
