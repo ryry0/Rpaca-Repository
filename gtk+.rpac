@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="gtk+"
+VER="2.24.29"
+EXT="tar.xz" # extension of download
+URL="http://ftp.gnome.org/pub/gnome/sources/$PKG/2.24/$PKG-$VER.$EXT"
+DESCRIPTION="The $PKG 2 package contains libraries used for creating GUIs."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+
+	sed -e 's#l \(gtk-.*\).sgml#& -o \1#' \
+	-i docs/{faq,tutorial}/Makefile.in &&
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	logMessage "Updating $PKG cache"
+	gtk-query-immodules-2.0 --update-cache || die "Updating $PKG cache failed"
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
