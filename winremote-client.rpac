@@ -27,6 +27,7 @@ extractSource() {
 compileSource() {
 	cd $SRC_DIR/$PKG-$VER
 	logMessage "Compiling $PKG"
+	git checkout x_based
 	make $GLOBAL_CFLAGS $CFLAGS
 }
 
