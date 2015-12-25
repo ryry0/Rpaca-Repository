@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="feh"
+VER="2.14"
+EXT="tar.bz2" # extension of download
+URL="http://feh.finalrewind.org/$PKG-$VER.$EXT"
+DESCRIPTION="feh is a fast, lightweight image viewer."
+CFLAGS="PREFIX=/usr"
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libpng imlib"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	sed -i "s:doc/feh:&-2.14:" config.mk &&
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make PREFIX=$FAKEROOT/usr install || die "$PKG make install failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}

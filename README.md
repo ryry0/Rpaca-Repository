@@ -111,7 +111,7 @@ Other
 * ~~redshift~~
 * syncthing
 * mplayer
-* feh
+* ~~feh~~
 * ~~unclutter~~
 * ~~syndaemon~~
 * wmctrl
