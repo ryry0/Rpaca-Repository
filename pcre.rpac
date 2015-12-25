@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="pcre"
+VER="8.37"
+EXT="tar.bz2" # extension of download
+URL="ftp://ftp.csx.cam.ac.uk/pub/software/programming/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The PCRE package contains Perl Compatible Regular Expression libraries."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --docdir=/usr/share/doc/$PKG-$VER --enable-unicode-properties --enable-pcre16
+--enable-pcre32 --enable-pcregrep-libz --enable-pcregrep-libbz2 --enable-pcretest-libreadline --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Downloading $PKG patch"
+
+	curl -L -O http://www.linuxfromscratch.org/patches/blfs/7.8/$PKG-$VER-upstream_fixes-1.patch
+
+	logMessage "Patching $PKG source"
+	patch -Np1 -i $PKG-$VER-upstream_fixes-1.patch
+
+	logMessage "Compiling $PKG"
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+	
+	install -d $FAKEROOT/lib
+	mv -v $FAKEROOT/usr/lib/libpcre.so.* $FAKEROOT/lib || die "Moving $PKG libraries failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	ln -sfv /lib/$(readlink /usr/lib/libpcre.so) /usr/lib/libpcre.so || die "Symlinking $PKG libraries failed"
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
