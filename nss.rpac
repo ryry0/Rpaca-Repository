@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="nss"
+VER="3.21"
+EXT="tar.gz" # extension of download
+URL="https://ftp.mozilla.org/pub/mozilla.org/security/$PKG/releases/NSS_3_21_RTM/src/$PKG-$VER.$EXT"
+DESCRIPTION="The Network Security Services package is a set of libaries designed to support development of security-enabled client and server apps."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="nspr"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+
+	logMessage "Downloading $PKG patch"
+	curl -L -O http://www.linuxfromscratch.org/patches/blfs/svn/$PKG-$VER-standalone-1.patch
+	
+	patch -Np1 -i $PKG-$VER-standalone-1.patch
+	
+	cd nss
+
+	make BUILD_OPT=1 \
+		NSPR_INCLUDE_DIR=/usr/include/nspr \
+		USE_SYSTEM_ZLIB=1 \
+		ZLIB_LIBS=-lz \
+		USE_64=1 \
+		$([ -f /usr/include/sqlite3.h ] && echo NSS_USE_SYSTEM_SQLITE=1) -j1 \
+		|| die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER/dist
+
+	install -dv -m755 $FAKEROOT/usr/lib && 
+	install -dv -m755 $FAKEROOT/usr/include/nss &&
+	install -dv -m755 $FAKEROOT/usr/bin &&
+	install -dv -m755 $FAKEROOT/usr/lib/pkgconfig && 
+	
+	install -v -m755 Linux*/lib/*.so 		$FAKEROOT/usr/lib &&
+	install -v -m644 Linux*/lib/{*.chk,libcrmf.a} 	$FAKEROOT/usr/lib &&
+	cp -v -RL {public,private}/nss/*		$FAKEROOT/usr/include/nss &&
+	chmod -v 644					$FAKEROOT/usr/include/nss/* &&
+	install -v -m755 Linux*/bin/{certutil,nss-config,pk12util} $FAKEROOT/usr/bin &&
+	install -v -m644 Linux*/lib/pkgconfig/nss.pc 	$FAKEROOT/usr/lib/pkgconfig ||
+	die "Creating $PKG fakeroot failed."
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
