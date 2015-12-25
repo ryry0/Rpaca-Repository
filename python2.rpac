@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="Python"
+VER="2.7.11"
+EXT="tar.xz" # extension of download
+URL="https://www.python.org/ftp/python/$VER/$PKG-$VER.$EXT"
+DESCRIPTION="The legacy python development environment."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --enable-shared --with-system-expat --with-system-ffi --enable-unicode=ucs4"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libffi"
+
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+	
+	chmod -v 755 $FAKEROOT/usr/lib/libpython2.7.so.1.0 || die "$PKG chmod failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
