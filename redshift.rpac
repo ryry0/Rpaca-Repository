@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="redshift"
+VER="git"
+EXT="tar.gz" # extension of download
+URL="https://github.com/jonls/$PKG.git"
+DESCRIPTION="Redshift adjusts the color of your screen according to your surroundings."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --with-systemduserunitdir=no"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="intltool libtool libdrm libxcb xorg-server"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	git clone $URL $PKG-$VER || die "Cloning $PKG source failed"
+}
+
+extractSource() {
+	return
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	./bootstrap &&
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}

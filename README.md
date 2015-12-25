@@ -108,7 +108,7 @@ Scientific Computing
 
 Other
 
-* redshift
+* ~~redshift~~
 * syncthing
 * mplayer
 * feh
