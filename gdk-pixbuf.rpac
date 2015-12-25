@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="gdk-pixbuf"
+VER="2.32.3"
+EXT="tar.xz" # extension of download
+URL="http://ftp.gnome.org/pub/gnome/sources/$PKG/2.32/$PKG-$VER.$EXT"
+DESCRIPTION="The gdk pixbuf is a toolkit for image loading and pixel buffer manipulation"
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --with-x11"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="glib libjpeg-turbo libpng xorg-libraries libtiff"
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+	
+	logMessage "Updating $PKG cache"
+	gdk-pixbuf-query-loaders --update-cache || die "Updating $PKG cache failed"
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
