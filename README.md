@@ -65,20 +65,20 @@ TODO:
 * vim
 * grub
 * dhcpcd
-* linux
+* ~~linux~~
 
 (base installation)
 
 Graphics
 
-* X
-* xorg-backlight
-* xorg-synaptics
-* xf86-video-intel/xf86-video-ati
-* alsa
-* alsa-utils
-* spectrwm/bspwm
-* rxvt-unicode
+* ~~X~~
+* ~~xorg-backlight~~
+* ~~xorg-synaptics~~
+* ~~xf86-video-intel~~/xf86-video-ati
+* ~~alsa~~
+* ~~alsa-utils~~
+* spectrwm/~~bspwm~~
+* ~~rxvt-unicode~~
 * chromium
 * chromium flash?
 * wicd
@@ -112,9 +112,9 @@ Other
 * syncthing
 * mplayer
 * feh
-* unclutter
-* syndaemon
+* ~~unclutter~~
+* ~~syndaemon~~
 * wmctrl
 * compton
 * infiality font bundle
-* terminus
+* ~~terminus~~
