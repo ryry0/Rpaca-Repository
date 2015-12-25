@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="syncthing"
+VER="0.12.9"
+EXT="tar.gz" # extension of download
+URL="https://github.com/$PKG/$PKG/releases/download/v$VER/$PKG-linux-amd64-v$VER.$EXT"
+DESCRIPTION="Syncthing replaces proprietary sync and cloud services with something open, trustworthy, and decentralized."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	curl -L -O $URL || die "Downloading $PKG failed"
+	mv $PKG-linux-amd64-v$VER.$EXT $PKG-$VER.$EXT
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.$EXT || die "Extracting $PKG source failed"
+	mv $PKG-linux-amd64-v$VER $PKG-$VER
+}
+
+compileSource() {
+	return
+}
+
+cleanSource() {
+	return
+}
+
+# Run make check on package
+checkSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+
+	install -dv $FAKEROOT/usr/bin &&
+	install -m755 syncthing $FAKEROOT/usr/bin || die "Creating $PKG fakeroot failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
