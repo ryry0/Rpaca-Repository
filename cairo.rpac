@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="cairo"
+VER="1.14.6"
+EXT="tar.xz" # extension of download
+URL="http://cairographics.org/releases/$PKG-$VER.$EXT"
+DESCRIPTION="Cairo is a 2D graphics library with support for multiple output devices."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static --enable-tee"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libpng pixman fontconfig glib xorg-libraries"
