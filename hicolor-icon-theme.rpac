@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="hicolor-icon-theme"
+VER="0.15"
+EXT="tar.xz" # extension of download
+URL="http://icon-theme.freedesktop.org/releases/$PKG-$VER.$EXT"
+DESCRIPTION="The $PKG package contains a default fallback theme for implementations of the icon theme specification."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
