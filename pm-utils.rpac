@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="pm-utils"
+VER="1.4.1"
+EXT="tar.gz" # extension of download
+URL="http://$PKG.freedesktop.org/releases/$PKG-$VER.$EXT"
+DESCRIPTION="The power management utilities is a small collection of scripts to suspend and hibernate computers."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --docdir=/usr/share/doc/$PKG-$VER"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
