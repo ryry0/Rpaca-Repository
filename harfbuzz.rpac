@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="harfbuzz"
+VER="1.0.3"
+EXT="tar.bz2" # extension of download
+URL="http://www.freedesktop.org/software/$PKG/release/$PKG-$VER.$EXT"
+DESCRIPTION="The Harfbuzz package contains an OpenType text shaping engine."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="icu freetype"
