@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="desktop-file-utils"
+VER="0.22"
+EXT="tar.xz" # extension of download
+URL="http://freedesktop.org/software/$PKG/releases/$PKG-$VER.$EXT"
+DESCRIPTION="The desktop file utils package contains command line utilities for working with desktop entries."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="glib"
