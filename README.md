@@ -115,6 +115,6 @@ Other
 * ~~unclutter~~
 * ~~syndaemon~~
 * wmctrl
-* compton
+* ~~compton~~
 * infiality font bundle
 * ~~terminus~~
