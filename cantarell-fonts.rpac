@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="cantarell-fonts"
+VER="0.0.19"
+EXT="tar.xz" # extension of download
+URL="http://ftp.gnome.org/pub/gnome/sources/$PKG/0.0/$PKG-$VER.$EXT"
+DESCRIPTION="The Cantarell typeface family provides a contemporary humanist sans serif."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	fc-cache -v /usr/share/fonts/cantarell || die "Updating font cache with $PKG failed"
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
