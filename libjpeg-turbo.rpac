@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libjpeg-turbo"
+VER="1.4.2"
+EXT="tar.gz" # extension of download
+URL="http://downloads.sourceforge.net/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="libjpeg-turbo is a fork of the original IJG libjpeg which uses SIMD to accelerate baseline JPEG [de]compression."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --mandir=/usr/share/man --with-jpeg8 --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="yasm"
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+
+	sed -i -e '/^docdir/ s:$:/libjpeg-turbo-1.4.2:' Makefile.in &&
+
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
