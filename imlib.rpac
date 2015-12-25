@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="imlib2"
+VER="1.4.7"
+EXT="tar.bz2" # extension of download
+URL="http://sourceforge.net/projects/enlightenment/files/$PKG-src/$VER/$PKG-$VER.$EXT"
+DESCRIPTION="Imlib2 is a graphics library for fast file loading, saving, rendering, and manipulation."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xorg-libraries"
