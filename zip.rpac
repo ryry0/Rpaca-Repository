@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="zip"
+VER="3.0"
+EXT="tgz" # extension of download
+URL="ftp://ftp.info-zip.org/pub/infozip/src/zip30.$EXT"
+DESCRIPTION="The Zip package contains zip utilities."
+CFLAGS=""
+CONF_FLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	curl -L -O $URL || die "Downloading $PKG failed"
+	mv zip30.tgz $PKG-$VER.$EXT
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.$EXT || die "Extracting $PKG source failed"
+	mv zip30 $PKG-$VER
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	make -f unix/Makefile generic_gcc $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make prefix=$FAKEROOT/usr MANDIR=$FAKEROOT/usr/share/man/man1 -f unix/Makefile install || die "$PKG make install failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
