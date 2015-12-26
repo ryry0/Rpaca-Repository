@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="fontconfig-infinality"
+VER="1-20130104_1"
+EXT="tar.bz2" # extension of download
+URL="http://www.infinality.net/fedora/linux/zips/$PKG-$VER.$EXT"
+DESCRIPTION="Infinality is a suite of settings to make font rendering nicer."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="fontconfig"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	curl -L -O $URL || die "Downloading $PKG failed"
+}
+
+extractSource() {
+	return	
+}
+
+compileSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	
+	install -dv $FAKEROOT/etc/fonts
+
+	tar xvf $PKG-$VER.$EXT -C $FAKEROOT/etc/fonts || die "Creating $PKG fakeroot failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	ln -sfnv styles.conf.avail/linux /etc/fonts/infinality/conf.d || die "Linking failed."
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
