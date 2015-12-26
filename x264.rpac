@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# check INSTALL file of packages to determine ENVAR for install location
+# just have each function die in the middle if failure
+# Overloaded variables:
+PKG="x264"
+VER="20150908-2245"
+EXT="tar.bz2" # extension of download
+URL="http://download.videolan.org/pub/videolan/$PKG/snapshots/$PKG-snapshot-$VER-stable.$EXT"
+DESCRIPTION="x264 package provides a library for encoding video streams into the h.264/mpeg-4 avc format"
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --enable-shared --disable-cli"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="yasm"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	curl -L -O $URL || die "Downloading $PKG failed"
+	mv $PKG-snapshot-$VER-stable.$EXT $PKG-$VER.$EXT
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.$EXT || die "Extracting $PKG source failed"
+	mv $PKG-snapshot-$VER-stable $PKG-$VER
+}
