@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="liberation-fonts"
+VER="2.00.1"
+EXT="tar.gz" # extension of download
+URL="https://fedorahosted.org/releases/l/i/$PKG/$PKG-ttf-$VER.$EXT"
+DESCRIPTION="This package provides a set of serif, sans-serif and monospaced fonts from Red Hat."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	curl -L -O $URL || die "Downloading $PKG failed"
+	mv $PKG-ttf-$VER.$EXT $PKG-$VER.$EXT
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.$EXT || die "Extracting $PKG source failed"
+	mv $PKG-ttf-$VER $PKG-$VER
+}
+
+compileSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+
+	install -v -d -m755 $FAKEROOT/usr/share/fonts/liberation &&
+	install -v -m644 *.ttf $FAKEROOT/usr/share/fonts/liberation ||
+	die "Creation of $PKG fakeroot failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	fc-cache -v /usr/share/fonts/liberation || die "Updating font cache with $PKG failed"
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
