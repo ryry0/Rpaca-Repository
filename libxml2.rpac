@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libxml2"
+VER="2.9.3"
+EXT="tar.gz" # extension of download
+URL="http://xmlsoft.org/sources/$PKG-$VER.$EXT"
+DESCRIPTION="The libxml2 package contains libraries and utilities used for parsing XML files."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static --with-history --with-python=/usr/bin/python3"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="python"
