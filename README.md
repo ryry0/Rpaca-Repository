@@ -109,12 +109,12 @@ Scientific Computing
 Other
 
 * ~~redshift~~
-* syncthing
+* ~~syncthing~~
 * mplayer
 * ~~feh~~
 * ~~unclutter~~
 * ~~syndaemon~~
 * wmctrl
 * ~~compton~~
-* infiality font bundle
+* ~~infiality font bundle~~
 * ~~terminus~~
