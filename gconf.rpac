@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="GConf"
+VER="3.2.6"
+EXT="tar.xz" # extension of download
+URL="http://ftp.gnome.org/pub/gnome/sources/$PKG/3.2/$PKG-$VER.$EXT"
+DESCRIPTION="The GConf package contains a configuration databasesystem used by many GNOME applications."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --disable-orbit --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="dbus-glib libxml2"
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+
+	install -d $FAKEROOT/gconf/ &&
+	cp -v gconf.xml.defaults $FAKEROOT/gconf/gconf.xml.system ||
+	dies "Creating $PKG fakeroot failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
