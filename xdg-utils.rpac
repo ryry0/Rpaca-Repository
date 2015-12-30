@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="xdg-utils"
+VER="1.1.1"
+EXT="tar.gz" # extension of download
+URL="http://portland.freedesktop.org/download/$PKG-$VER.$EXT"
+DESCRIPTION="xdg-utils is a a set of command line tools that assist applications with a variety of desktop integration tasks."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --mandir=/usr/share/man"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xmlto links"
