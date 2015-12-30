@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="sgml-common"
+VER="0.6.3"
+EXT="tgz" # extension of download
+URL="ftp://sources.redhat.com/pub/docbook-tools/new-trials/SOURCES/$PKG-$VER.$EXT"
+DESCRIPTION="The SGML Common package contains install-catalog. This is useful for creating and maintaining centralized SGML catalogs."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Downloading $PKG patch"
+	curl -O -L  http://www.linuxfromscratch.org/patches/blfs/svn/$PKG-$VER-manpage-1.patch || die "Downloading $PKG patch failed"
+
+	logMessage "Patching source"
+	patch -Np1 -i $PKG-$VER-manpage-1.patch || die "Patching $PKG failed"
+
+	logMessage "Compiling $PKG"
+	autoreconf -f -i &&
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" docdir=/usr/share/doc install || die "$PKG make install failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+# install the program from the standalone package
+installPackage() {
+	logMessage "Installing $PKG"
+	logMessage "CDing to $PKG fakeroot"
+	cd $FAKEROOT || die "$PKG fakeroot does not exist"
+
+	logMessage "Creating $PKG directories"
+	for dir in $(find . -type d | sed -e 's@./@@'); do
+		install -dv /${dir} || die "Creating ${dir} for $PKG failed"
+	done
+
+	logMessage "Copying $PKG files"
+	for file in $(find . ! -type d | sed -e 's@./@@'); do
+		cp -dpf "${file}" "/${file}" || die "Creating ${dir} for $PKG failed"
+	done
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	logMessage "Installing catalogs"
+	install-catalog --add /etc/sgml/sgml-ent.cat \
+		/usr/share/sgml/sgml-iso-entities-8879.1986/catalog &&
+
+	install-catalog --add /etc/sgml/sgml-docbook.cat \
+		/etc/sgml/sgml-ent.cat || die "Installing $PKG catalogues failed"
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
+
+preremovePackage() {
+	logMessage "PreRemove $PKG"
+
+	logMessage "Removing $PKG catalogues"
+
+	install-catalog --remove /etc/sgml/sgml-ent.cat \
+		/usr/share/sgml/sgml-iso-entities-8879.1986/catalog &&
+
+	install-catalog --remove /etc/sgml/sgml-docbook.cat \
+		/etc/sgml/sgml-ent.cat ||
+	die "Removing $PKG catalogues failed"
+
+	return
+}
