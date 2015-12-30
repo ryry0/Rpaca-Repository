@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libcap"
+VER="2.24"
+EXT="tar.xz" # extension of download
+URL="http://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/$PKG-$VER.$EXT"
+DESCRIPTION="The libcap package implements the user-space interfaces to the POSIX 1003.1e capabilities available in Linux kernels."
+CFLAGS=""
+CONF_FLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="attr"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" RAISE_SETFCAP=no prefix=/usr install || die "$PKG make install failed"
+
+	install -dv $FAKEROOT/lib &&
+	chmod -v 755 $FAKEROOT/usr/lib/libcap.so && 
+	mv -v $FAKEROOT/usr/lib/libcap.so.* $FAKEROOT/lib ||
+	die "Creating $PKG fakeroot failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	ln -sfv /lib/$(readlink /usr/lib/libcap.so) /usr/lib/libcap.so ||
+	die "Linking $PKG libraries failed"
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
