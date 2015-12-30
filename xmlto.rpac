@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="xmlto"
+VER="0.0.28"
+EXT="tar.bz2" # extension of download
+URL="https://fedorahosted.org/releases/x/m/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The xmlto is a front-end to an XSL toolchain."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="docbook-xml docbook-xsl libxslt"
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	LINKS="/usr/bin/links" \
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
