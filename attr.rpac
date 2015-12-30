@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="attr"
+VER="2.4.47"
+EXT="tar.gz" # extension of download
+URL="http://download.savannah.gnu.org/releases/$PKG/$PKG-$VER.src.$EXT"
+DESCRIPTION="The attr package contains utilities to administer the extended attributes on filesystem objects."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	curl -L -O $URL || die "Downloading $PKG failed"
+	mv $PKG-$VER.src.$EXT $PKG-$VER.$EXT
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.$EXT || die "Extracting $PKG source failed"
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	INSTALL_USER=root \
+	INSTALL_GROUP=root \
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" install install-dev install-lib || die "$PKG make install failed"
+
+	install -dv $FAKEROOT/lib &&
+	chmod -v 755 $FAKEROOT/usr/lib/libattr.so &&
+	mv -v $FAKEROOT/usr/lib/libattr.so.* $FAKEROOT/lib || die "Creating $PKG fakeroot failed"
+	
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	ln -sfv /lib/libattr.so.1 /usr/lib/libattr.so || die "Linking $PKG files failed"
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
