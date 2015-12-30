@@ -1,0 +1,153 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="docbook-xml"
+VER="4.5"
+EXT="zip" # extension of download
+URL="http://www.docbook.org/xml/$VER/$PKG-$VER.$EXT"
+DESCRIPTION=" The DocBook XML DTD-4.5 package contains document type definitions for verification of XML data files against the DocBook rule set. "
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libxml2 sgml-common unzip"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	mkdir $SRC_DIR/$PKG-$VER &&
+	cd $SRC_DIR/$PKG-$VER
+
+	logMessage "Downloading $PKG"
+	curl -L -O $URL || die "Downloading $PKG failed"
+}
+
+extractSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Extracting $PKG source"
+	unzip $PKG-$VER.$EXT || die "Extracting $PKG source failed"
+}
+
+compileSource() {
+	return
+}
+
+cleanSource() {
+	return
+}
+
+# Run make check on package
+checkSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+
+	install -v -d -m755 $FAKEROOT/usr/share/xml/docbook/xml-dtd-$VER &&
+	install -v -d -m755 $FAKEROOT/etc/xml &&
+	chown -R root:root . &&
+	cp -v -af docbook.cat *.dtd ent/ *.mod \
+		$FAKEROOT/usr/share/xml/docbook/xml-dtd-$VER || 
+	die "Copying $PKG initial files failed"
+
+	if [ ! -e $FAKEROOT/etc/xml/docbook ]; then
+		xmlcatalog --noout --create $FAKEROOT/etc/xml/docbook
+	fi &&
+	xmlcatalog --noout --add "public" \
+		"-//OASIS//DTD DocBook XML V$VER//EN" \
+		"http://www.oasis-open.org/docbook/xml/$VER/docbookx.dtd" \
+		$FAKEROOT/etc/xml/docbook &&
+	xmlcatalog --noout --add "public" \
+		"-//OASIS//DTD DocBook XML CALS Table Model V$VER//EN" \
+		"file:///usr/share/xml/docbook/xml-dtd-$VER/calstblx.dtd" \
+		$FAKEROOT/etc/xml/docbook &&
+	xmlcatalog --noout --add "public" \
+		"-//OASIS//DTD XML Exchange Table Model 19990315//EN" \
+		"file:///usr/share/xml/docbook/xml-dtd-$VER/soextblx.dtd" \
+		$FAKEROOT/etc/xml/docbook &&
+	xmlcatalog --noout --add "public" \
+		"-//OASIS//ELEMENTS DocBook XML Information Pool V$VER//EN" \
+		"file:///usr/share/xml/docbook/xml-dtd-$VER/dbpoolx.mod" \
+		$FAKEROOT/etc/xml/docbook &&
+	xmlcatalog --noout --add "public" \
+		"-//OASIS//ELEMENTS DocBook XML Document Hierarchy V$VER//EN" \
+		"file:///usr/share/xml/docbook/xml-dtd-$VER/dbhierx.mod" \
+		$FAKEROOT/etc/xml/docbook &&
+	xmlcatalog --noout --add "public" \
+		"-//OASIS//ELEMENTS DocBook XML HTML Tables V$VER//EN" \
+		"file:///usr/share/xml/docbook/xml-dtd-$VER/htmltblx.mod" \
+		$FAKEROOT/etc/xml/docbook &&
+	xmlcatalog --noout --add "public" \
+		"-//OASIS//ENTITIES DocBook XML Notations V$VER//EN" \
+		"file:///usr/share/xml/docbook/xml-dtd-$VER/dbnotnx.mod" \
+		$FAKEROOT/etc/xml/docbook &&
+	xmlcatalog --noout --add "public" \
+		"-//OASIS//ENTITIES DocBook XML Character Entities V$VER//EN" \
+		"file:///usr/share/xml/docbook/xml-dtd-$VER/dbcentx.mod" \
+		$FAKEROOT/etc/xml/docbook &&
+	xmlcatalog --noout --add "public" \
+		"-//OASIS//ENTITIES DocBook XML Additional General Entities V$VER//EN" \
+		"file:///usr/share/xml/docbook/xml-dtd-$VER/dbgenent.mod" \
+		$FAKEROOT/etc/xml/docbook &&
+		xmlcatalog --noout --add "rewriteSystem" \
+		"http://www.oasis-open.org/docbook/xml/$VER" \
+		"file:///usr/share/xml/docbook/xml-dtd-$VER" \
+		$FAKEROOT/etc/xml/docbook &&
+	xmlcatalog --noout --add "rewriteURI" \
+		"http://www.oasis-open.org/docbook/xml/$VER" \
+		"file:///usr/share/xml/docbook/xml-dtd-$VER" \
+		$FAKEROOT/etc/xml/docbook ||
+		die "Adding $PKG catalogues failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	if [ ! -e /etc/xml/catalog ]; then
+		xmlcatalog --noout --create /etc/xml/catalog
+	fi &&
+	xmlcatalog --noout --add "delegatePublic" \
+		"-//OASIS//ENTITIES DocBook XML" \
+		"file:///etc/xml/docbook" \
+		/etc/xml/catalog &&
+	xmlcatalog --noout --add "delegatePublic" \
+		"-//OASIS//DTD DocBook XML" \
+		"file:///etc/xml/docbook" \
+		/etc/xml/catalog &&
+	xmlcatalog --noout --add "delegateSystem" \
+		"http://www.oasis-open.org/docbook/" \
+		"file:///etc/xml/docbook" \
+		/etc/xml/catalog &&
+	xmlcatalog --noout --add "delegateURI" \
+		"http://www.oasis-open.org/docbook/" \
+		"file:///etc/xml/docbook" \
+		/etc/xml/catalog ||
+	die "Updating $PKG catalogues failed"
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
+
+preremovePackage() {
+	logMessage "PreRemove $PKG"
+	xmlcatalog --noout --del file:///etc/xml/docbook-xml /etc/xml/catalog ||
+	die "Removing $PKG catalogues failed"
+	return
+}
