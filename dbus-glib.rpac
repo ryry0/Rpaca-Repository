@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="dbus-glib"
+VER="0.104"
+EXT="tar.gz" # extension of download
+URL="http://dbus.freedesktop.org/releases/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The D-Bus GLib package contains GLib interfaces to the D-Bus API."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="dbus glib"
