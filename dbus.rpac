@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="dbus"
+VER="1.10.6"
+EXT="tar.gz" # extension of download
+URL="http://dbus.freedesktop.org/releases/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="D-Bus is a message bus system, a simple way for applications to talk to one another.."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-doxygen-docs --disable-xml-docs --disable-static --disable-systemd --without-systemdsystemunitdir --with-console-auth-dir=/run/console/ --docdir=/usr/share/doc/$PKG-$VER"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xorg-libraries"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+preinstallPackage() {
+	logMessage "PreInstall $PKG"
+	cd $PKG_DIR
+	logMessage "Extracting $PKG package"
+	tar -xvzf $PKG-$VER.tar.gz || die "$PKG package extraction failed"
+	cd $FAKEROOT
+	
+	groupadd -g 18 messagebus &&
+	useradd -c "D-Bus Message Daemon User" -d /var/run/dbus -u 18 -g messagebus -s /bin/false messagebus || die "Adding $PKG user and group failed"
+
+	return $?
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	chown -v root:messagebus /usr/libexec/dbus-daemon-launch-helper &&
+	chmod -v 4750 /usr/libexec/dbus-daemon-launch-helper ||
+	die "Changing mode and owner of $PKG files failed"
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
+
+postremovePackage() {
+	logMessage "PostRemove $PKG"
+
+	userdel messagebus &&
+	groupdel messagebus || die "Removing $PKG user and group failed"
+
+	logMessage "Removing $PKG from index"
+	rm -v $PKG_INDEX/$PKG-$VER
+	return
+}
