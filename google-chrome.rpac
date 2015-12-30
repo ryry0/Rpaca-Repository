@@ -10,7 +10,7 @@ DESCRIPTION="An attempt at creating a safer, faster, and more stable browser."
 CFLAGS=""
 CONF_FLAGS="--prefix=/usr"
 FAKEROOT=$PKG_DIR/$PKG-$VER
-DEPS="alsa-lib desktop-file-utils flac gconf gtk2 harfbuzz icu libpng nss opus snappy"
+DEPS="alsa-lib desktop-file-utils flac gconf gtk2 harfbuzz icu libpng nss dbus libcap xdg-utils libxml2"
 
 #---------------------------------------------------------------
 # Overloadable functions:
