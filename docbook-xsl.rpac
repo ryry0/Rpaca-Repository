@@ -1,0 +1,109 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="docbook-xsl"
+VER="1.78.1"
+EXT="tar.bz2" # extension of download
+URL="http://downloads.sourceforge.net/docbook/$PKG-$VER.$EXT"
+DESCRIPTION="The DocBook XSL Stylesheets package contains XSL stylesheets. These are useful for performing transformations on XML DocBook files."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libxml2"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	return
+}
+
+cleanSource() {
+	return
+}
+
+# Run make check on package
+checkSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+
+	install -v -m755 -d $FAKEROOT/usr/share/xml/docbook/xsl-stylesheets-$VER &&
+
+	cp -v -R VERSION common eclipse epub extensions fo highlighting html \
+		htmlhelp images javahelp lib manpages params profiling \
+		roundtrip slides template tests tools webhelp website \
+		xhtml xhtml-1_1 \
+		$FAKEROOT/usr/share/xml/docbook/xsl-stylesheets-$VER &&
+
+	ln -s VERSION $FAKEROOT/usr/share/xml/docbook/xsl-stylesheets-$VER/VERSION.xsl &&
+
+	install -v -m644 -D README \
+		$FAKEROOT/usr/share/doc/$PKG-$VER/README.txt &&
+	install -v -m644    RELEASE-NOTES* NEWS* \
+	$FAKEROOT/usr/share/doc/$PKG-$VER || 
+	die "Building $PKG failed"
+
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	if [ ! -d /etc/xml ]; then install -v -m755 -d /etc/xml; fi &&
+	if [ ! -f /etc/xml/catalog ]; then
+	    xmlcatalog --noout --create /etc/xml/catalog
+	fi &&
+
+	xmlcatalog --noout --add "rewriteSystem" \
+		   "http://docbook.sourceforge.net/release/xsl/$VER" \
+		   "/usr/share/xml/docbook/xsl-stylesheets-$VER" \
+	    /etc/xml/catalog &&
+
+	xmlcatalog --noout --add "rewriteURI" \
+		   "http://docbook.sourceforge.net/release/xsl/$VER" \
+		   "/usr/share/xml/docbook/xsl-stylesheets-$VER" \
+	    /etc/xml/catalog &&
+
+	xmlcatalog --noout --add "rewriteSystem" \
+		   "http://docbook.sourceforge.net/release/xsl/current" \
+		   "/usr/share/xml/docbook/xsl-stylesheets-$VER" \
+	    /etc/xml/catalog &&
+
+	xmlcatalog --noout --add "rewriteURI" \
+		   "http://docbook.sourceforge.net/release/xsl/current" \
+		   "/usr/share/xml/docbook/xsl-stylesheets-$VER" \
+	    /etc/xml/catalog ||
+	
+	die "Added $PKG catalogues failed"
+
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
+
+preremovePackage() {
+	logMessage "PreRemove $PKG"
+
+	xmlcatalog --noout --del "/usr/share/xml/docbook/xsl-stylesheets-${pkgver}" /etc/xml/catalog &&
+	xmlcatalog --noout --del "/usr/share/xml/docbook" /etc/xml/catalog &&
+	xmlcatalog --noout --del "file:///etc/xml/docbook" /etc/xml/catalog || die "Preremove $PKG failed"
+
+	return
+}
