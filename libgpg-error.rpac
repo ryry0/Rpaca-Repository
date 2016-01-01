@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libgpg-error"
+VER="1.21"
+EXT="tar.bz2" # extension of download
+URL=" ftp://ftp.gnupg.org/gcrypt/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The libgpg-error package contains a library that defines common error values for all GnuPG components."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
