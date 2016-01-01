@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="gnutls"
+VER="3.4.7"
+EXT="tar.xz" # extension of download
+URL="ftp://ftp.gnutls.org/gcrypt/$PKG/v3.4/$PKG-$VER.$EXT"
+DESCRIPTION="The GnuTLS package contains libraries and userspace tools which provide a secure layer over a reliable transport layer."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr -with-default-trust-store-file=/etc/ssl/ca-bundle.crt"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="nettle ca-certificates libtasn p11-kit"
