@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libsndfile"
+VER="1.0.26"
+EXT="tar.gz" # extension of download
+URL="http://www.mega-nerd.com/$PKG/files/$PKG-$VER.$EXT"
+DESCRIPTION="Libsndfile is a library of C routines for reading and writing files containing sampled audio data."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static --docdir=/usr/share/doc/$PKG-$VER"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="alsa-lib flac libogg libvorbis sqlite"
