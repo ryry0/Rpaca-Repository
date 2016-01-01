@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="json-c"
+VER="0.12"
+EXT="tar.gz" # extension of download
+URL="https://s3.amazonaws.com/json-c_releases/releases/$PKG-$VER.$EXT"
+DESCRIPTION="The JSON-C implements a reference counting object model that allows you to easily construct JSON objects in C, output them as JSON formatted strings and parse JSON formatted strings back into the C representation of JSON objects."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	sed -i s/-Werror// Makefile.in &&
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make -j1 $CFLAGS || die "Compiling $PKG source failed"
+}
