@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="gcr"
+VER="3.18.0"
+EXT="tar.xz" # extension of download
+URL="http://ftp.gnome.org/pub/gnome/sources/$PKG/3.18/$PKG-$VER.$EXT"
+DESCRIPTION="The Gcr package contains libraries used for displaying certificates and accessing key stores."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --without-gtk"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="glib libgcrypt libtasn1 p11-kit libxslt"
