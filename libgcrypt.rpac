@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libgcrypt"
+VER="1.6.4"
+EXT="tar.bz2" # extension of download
+URL="ftp://ftp.gnupg.org/gcrypt/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The libgcrypt package contains a general purpose crypto library based on the code used in GnuPG. The library provides a high level interface to cryptographic building blocks using an extendable and flexible API."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libgpg-error"
