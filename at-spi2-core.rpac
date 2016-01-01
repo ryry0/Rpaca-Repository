@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="at-spi2-core"
+VER="2.18.3"
+EXT="tar.xz" # extension of download
+URL="http://ftp.gnome.org/pub/gnome/sources/$PKG/2.18/$PKG-$VER.$EXT"
+DESCRIPTION="The At-Spi2 Core package is a part of the GNOME Accessibility Project."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="dbus glib xorg-libraries"
