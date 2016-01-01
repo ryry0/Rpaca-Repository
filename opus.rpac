@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="opus"
+VER="1.1.1"
+EXT="tar.gz" # extension of download
+URL="http://downloads.xiph.org/releases/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="Opus is a lossy audio compression format developed by the Internet Engineering Task Force (IETF) that is particularly suitable for interactive speech and audio transmission over the Internet."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static --docdir=/usr/share/doc/$PKG-$VER"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
