@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="p11-kit"
+VER="0.23.2"
+EXT="tar.gz" # extension of download
+URL="http://p11-glue.freedesktop.org/releases/$PKG-$VER.$EXT"
+DESCRIPTION="The p11-kit package Provides a way to load and enumerate PKCS #11 (a Cryptographic Token Interface Standard) modules. "
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="ca-certificates libtasn1 libffi"
