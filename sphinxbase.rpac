@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="sphinxbase"
+VER="5prealpha"
+EXT="tar.gz" # extension of download
+URL="http://downloads.sourceforge.net/project/cmusphinx/$PKG/$VER/$PKG-$VER.$EXT"
+DESCRIPTION="CMU sphinx is a speech recognition toolkit."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="python alsa-lib"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.$EXT || die "Extracting $PKG source failed"
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+
+	logMessage "Compiling $PKG"
+	./autogen.sh &&
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
