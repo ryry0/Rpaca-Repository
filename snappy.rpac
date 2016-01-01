@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="snappy"
+VER="git"
+EXT="tar.gz" # extension of download
+URL="https://github.com/google/$PKG.git"
+DESCRIPTION="A fast [de]compressor library."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	git clone $URL $PKG-$VER || die "Cloning $PKG source failed"
+}
+
+extractSource() {
+	return
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	./autogen.sh &&
+	CXXFLAGS+=\ -DNDEBUG &&
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
