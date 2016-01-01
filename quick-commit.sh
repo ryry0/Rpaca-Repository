@@ -1,4 +1,5 @@
 #!/bin/bash
 
-git add ${1}.rpac
-git commit -m "Added ${1} build."
+git add ${1}
+NAME=$(echo ${1} | sed 's/.rpac//')
+git commit -m "Added $NAME build."
