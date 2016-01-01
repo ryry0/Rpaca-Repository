@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="gnome-keyring"
+VER="3.18.3"
+EXT="tar.xz" # extension of download
+URL="http://ftp.gnome.org/pub/gnome/sources/$PKG/3.18/$PKG-$VER.$EXT"
+DESCRIPTION="The GNOME Keyring package contains a daemon that keeps passwords and other secrets for users. "
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="dbus gcr"
