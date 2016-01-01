@@ -1,0 +1,113 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="cups"
+VER="2.1.2"
+EXT="tar.bz2" # extension of download
+URL="http://www.cups.org/software/$VER/$PKG-$VER-source.$EXT"
+DESCRIPTION="The Common Unix Printing System (CUPS) is a print spooler and associated utilities."
+CFLAGS=""
+FAKEROOT=$PKG_DIR/$PKG-$VER
+CONF_FLAGS="--prefix=$FAKEROOT --libdir=/usr/lib --disable-systemd --with-rcdir=/tmp/cupsinit --with-system-groups=lpadmin --with-docdir=/usr/share/$KPG/doc-$VER"
+DEPS="gnutls dbus python2 xdg-utils"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	curl -L -O $URL || die "Downloading $PKG failed"
+	mv $PKG-$VER-source.$EXT $PKG-$VER.$EXT
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.$EXT || die "Extracting $PKG source failed"
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+
+	sed -i 's:555:755:g;s:444:644:g' Makedefs.in                                  &&
+	sed -i '/MAN.EXT/s:.gz::g' configure config-scripts/cups-manpages.m4          &&
+	sed -i '/LIBGCRYPTCONFIG/d' config-scripts/cups-ssl.m4                        &&
+
+	aclocal  -I config-scripts &&
+	autoconf -I config-scripts &&
+
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+
+	install -dv $FAKEROOT/usr/share/doc/$PKG-$VER &&
+	install -dv $FAKEROOT/etc/cups/ &&
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+
+	echo "ServerName /var/run/cups/cups.sock" > $FAKEROOT/etc/cups/client.conf &&
+
+	rm -rf $FAKEROOT/usr/share/cups/banners &&
+	rm -rf $FAKEROOT/usr/share/cups/data/testprint || die "Creating $PKG fakeroot failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+preinstallPackage() {
+	logMessage "PreInstall $PKG"
+	cd $PKG_DIR
+
+	logMessage "Adding required $PKG groups and users"
+
+	groupadd -g 19 lpadmin -f &&
+	groupadd lp -f &&
+	useradd -c "Print Service User" -d /var/spool/cups -g lp -s /bin/false -u 9 lp || 
+	die "Adding required $PKG groups and users failed" 
+
+	logMessage "Extracting $PKG package"
+	tar -xvzf $PKG-$VER.tar.gz || die "$PKG package extraction failed"
+	cd $FAKEROOT
+	return $?
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	rm -rvf /tmp/cupsinit
+
+	gtk-update-icon-cache
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
+
+postremovePackage() {
+	logMessage "PostRemove $PKG"
+
+	logMessage "Removing $PKG user and group"
+	userdel lp &&
+	groupdel lp &&
+	groupdel lpadmin || die "Removing $PKG user and group failed"
+
+	logMessage "Removing $PKG from index"
+	rm -v $PKG_INDEX/$PKG-$VER
+	return
+}
