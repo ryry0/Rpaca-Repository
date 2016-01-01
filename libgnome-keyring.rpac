@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libgnome-keyring"
+VER="3.8.0"
+EXT="tar.xz" # extension of download
+URL="http://ftp.gnome.org/pub/gnome/sources/$PKG/3.8/$PKG-$VER.$EXT"
+DESCRIPTION="The libgnome-keyring is used by applications to integrate with the GNOME Keyring system."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="dbus glib intltool libgcrypt"
