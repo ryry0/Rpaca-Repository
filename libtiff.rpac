@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Overloaded variables:
-PKG="tiff"
+PKG="libtiff"
 VER="4.0.6"
 EXT="tar.gz" # extension of download
 URL="http://download.osgeo.org/libtiff/$PKG-$VER.$EXT"
