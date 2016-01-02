@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libexif"
+VER="0.6.21"
+EXT="tar.bz2" # extension of download
+URL="http://downloads.sourceforge.net/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The libexif package contains a library for parsing, editing, and saving EXIF data."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static --with-doc-dir=/usr/share/doc/$PKG-$VER"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
