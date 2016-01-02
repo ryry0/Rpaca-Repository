@@ -10,7 +10,7 @@ DESCRIPTION="An attempt at creating a safer, faster, and more stable browser."
 CFLAGS=""
 CONF_FLAGS="--prefix=/usr"
 FAKEROOT=$PKG_DIR/$PKG-$VER
-DEPS="alsa-lib desktop-file-utils flac gconf gtk2 harfbuzz icu libpng nss dbus libcap xdg-utils libxml2"
+DEPS="alsa-lib desktop-file-utils flac gconf gtk2 harfbuzz icu libpng nss dbus libcap xdg-utils libxml2 opus snappy libexif"
 
 #---------------------------------------------------------------
 # Overloadable functions:
@@ -51,9 +51,12 @@ buildPackage() {
 	logMessage "Building $PKG to fakeroot"
 	cd $SRC_DIR/$PKG-$VER
 
-	install -d $FAKEROOT/opt
-	cp -r opt $FAKEROOT
-	cp -r usr $FAKEROOT
+	install -d $FAKEROOT/opt &&
+	cp -r opt $FAKEROOT &&
+	cp -r usr $FAKEROOT &&
+	chmod 4755 $FAKEROOT/opt/google/chrome/chrome-sandbox ||
+	die "Creating $PKG fakeroot failed"
+
 
 	cd $PKG_DIR
 	logMessage "Tarring and compressing $PKG"
