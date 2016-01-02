@@ -79,8 +79,8 @@ Graphics
 * ~~alsa-utils~~
 * spectrwm/~~bspwm~~
 * ~~rxvt-unicode~~
-* chromium
-* chromium flash?
+* ~~chromium~~
+* ~~chromium flash?~~
 * wicd
 * xclip
 
