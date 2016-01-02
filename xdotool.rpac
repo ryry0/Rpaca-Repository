@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="xdotool"
+VER="git"
+EXT="" # extension of download
+URL="https://github.com/jordansissel/xdotool.git"
+DESCRIPTION="Fake input from the mouse and keyboard very easily.  Also supports window manager actions such as moving, activating, and other actions on windows."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="xorg-libraries"
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	git clone $URL $PKG-$VER || die "Downloading $PKG failed"
+}
+
+extractSource() {
+	return
+}
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make PREFIX=/usr DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
