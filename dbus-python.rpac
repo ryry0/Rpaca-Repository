@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="dbus-python"
+VER="1.2.0"
+EXT="tar.gz" # extension of download
+URL="http://dbus.freedesktop.org/releases/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The dbus python provides python bindings to the dbus."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --docdir=/usr/share/doc/$PKG-$VER"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="dbus-glib python python2"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG as python2 module"
+	mkdir python2 &&
+	pushd python2 &&
+	PYTHON=/usr/bin/python \
+	../configure $CONF_FLAGS || die "Configure $PKG source as python2 module failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source as python2 module failed"
+	popd
+
+	logMessage "Compiling $PKG as python3 module"
+	mkdir python3 &&
+	pushd python3 &&
+	PYTHON=/usr/bin/python3 \
+	../configure $CONF_FLAGS || die "Configure $PKG source as python3 module failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source as python3 module failed"
+	popd
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" -C python2 install || die "$PKG make install failed"
+	make DESTDIR="$FAKEROOT" -C python3 install || die "$PKG make install failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
