@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="urwid"
+VER="git"
+EXT="git" # extension of download
+URL="https://github.com/$PKG/$PKG.$EXT"
+DESCRIPTION="Urwid is a console user interface library for python."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="python"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	git clone $URL $PKG-$VER || die "Downloading $PKG failed"
+}
+
+extractSource() {
+	return
+}
+
+compileSource() {
+	return
+}
+
+cleanSource() {
+	return
+}
+
+# Run make check on package
+checkSource() {
+	return
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	python setup.py install --root=$FAKEROOT || die "$PKG make install failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
