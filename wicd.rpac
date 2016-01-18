@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="wicd"
+VER="1.7.3"
+EXT="tar.gz" # extension of download
+URL="http://launchpad.net/$PKG/1.7/$VER/+download/$PKG-$VER.$EXT"
+DESCRIPTION="Wicd is a network manager written in python."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="python2 dbus-python wireless_tools net-tools wpa_supplicant dhcpcd pm-utils urwid py2cairo pygobject"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+
+	sed -e "/wpath.logrotate\|wpath.systemd/d" \
+	    -e "/detection failed/ a\                self.init=\'init\/default\/wicd\'" \
+	    -i setup.py                                     &&
+	rm po/*.po                                          &&
+
+	python setup.py configure --no-install-kde     \
+				  --no-install-acpi    \
+				  --no-install-init    \
+				  --no-install-gnome-shell-extensions \
+				  --docdir=/usr/share/doc/$PKG-$VER || 
+	die "Configure $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	LANG=C python setup.py install --root=$FAKEROOT || die "$PKG make install failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
