@@ -81,7 +81,7 @@ Graphics
 * ~~rxvt-unicode~~
 * ~~chromium~~
 * ~~chromium flash?~~
-* wicd
+* ~~wicd~~
 * xclip
 
 Programming
