@@ -17,10 +17,10 @@ DEPS=""
 compileSource() {
 	cd $SRC_DIR/$PKG-$VER
 
-	curl -L -O http://www.linuxfromscratch.org/patches/blfs/svn/$PKG-$VER-remove_dups-1.patch || die "Downloading $PKG patch failed"
+	#curl -L -O http://www.linuxfromscratch.org/patches/blfs/svn/$PKG-$VER-remove_dups-1.patch || die "Downloading $PKG patch failed"
 
-	logMessage "Patching $PKG"
-	patch -Np1 -i $PKG-$VER-remove_dups-1.patch &&
+	#logMessage "Patching $PKG"
+	#patch -Np1 -i $PKG-$VER-remove_dups-1.patch &&
 	yes "" | make config || 
 	die "Configure $PKG source failed"
 
@@ -33,6 +33,9 @@ buildPackage() {
 	logMessage "Building $PKG to fakeroot"
 	cd $SRC_DIR/$PKG-$VER
 	make DESTDIR="$FAKEROOT" update || die "$PKG make install failed"
+
+	rm -v $FAKEROOT/bin/hostname &&
+
 	cd $PKG_DIR
 	logMessage "Tarring and compressing $PKG"
 	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
