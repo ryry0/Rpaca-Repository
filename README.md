@@ -88,9 +88,9 @@ Programming
 
 * ~~zsh~~
 * avrgcc
-* gdb
+* ~~gdb~~
 * ctags
-* valgrind
+* ~~valgrind~~
 * strace
 * ~~git~~
 * ~~tmux~~
