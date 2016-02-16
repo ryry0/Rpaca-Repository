@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="mutt"
+VER="1.5.24"
+EXT="tar.gz" # extension of download
+URL="ftp://ftp.mutt.org/pub/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The Mutt package contains a mail user agent."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --with-docdir=/usr/share/doc/$PKG-$VER --enable-pop --enable-imap --enable-hcache --without-qdbm --with-gdbm --without-bdb --without-tokyocabinet"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libxslt gdb gnutls openssl"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	cp -v doc/manual.txt{,.shipped} &&
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+preinstallPackage() {
+	logMessage "PreInstall $PKG"
+	cd $PKG_DIR
+	logMessage "Extracting $PKG package"
+	tar -xvzf $PKG-$VER.tar.gz || die "$PKG package extraction failed"
+	cd $FAKEROOT
+	groupadd -g 34 mail
+	chgrp -v mail /var/mail
+	return $?
+}
+
+postremovePackage() {
+	logMessage "PostRemove $PKG"
+	logMessage "Removing $PKG from index"
+	groupdel mail
+	chgrp -v root /var/mail
+	rm -v $PKG_INDEX/$PKG-$VER
+	return
+}
