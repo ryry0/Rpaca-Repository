@@ -7,7 +7,7 @@ EXT="tar.gz" # extension of download
 URL="ftp://ftp.mutt.org/pub/$PKG/$PKG-$VER.$EXT"
 DESCRIPTION="The Mutt package contains a mail user agent."
 CFLAGS=""
-CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --with-docdir=/usr/share/doc/$PKG-$VER --enable-pop --enable-imap --enable-hcache --without-qdbm --with-gdbm --without-bdb --without-tokyocabinet"
+CONF_FLAGS="--prefix=/usr --sysconfdir=/etc --with-docdir=/usr/share/doc/$PKG-$VER --enable-pop --enable-imap --enable-hcache --without-qdbm --with-gdbm --without-bdb --without-tokyocabinet --enable-smtp --with-ssl"
 FAKEROOT=$PKG_DIR/$PKG-$VER
 DEPS="libxslt gdb gnutls openssl"
 
