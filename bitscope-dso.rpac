@@ -1,0 +1,150 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="bitscope-dso"
+VER="2.8.FE22H"
+EXT="tar.gz" # extension of download
+URL="http://bitscope.com/download/files/${PKG}_${VER}.$EXT"
+DESCRIPTION="Digital oscilloscope program"
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+# Dl package
+downloadSource() {
+	cd $SRC_DIR
+	logMessage "Downloading $PKG"
+	curl -L -O $URL || die "Downloading $PKG failed"
+	mv ${PKG}_${VER}.$EXT $PKG-$VER.$EXT
+}
+
+extractSource() {
+	cd $SRC_DIR
+	logMessage "Extracting $PKG source"
+	tar -xvf $PKG-$VER.$EXT || die "Extracting $PKG source failed"
+	mv ${PKG}_$VER $PKG-$VER
+}
+
+compileSource() {
+	return
+}
+
+cleanSource() {
+	logMessage "Cleaning $PKG source"
+	cd $SRC_DIR/$PKG-$VER
+	make clean || die "Cleaning $PKG source failed"
+}
+
+# Run make check on package
+checkSource() {
+	logMessage "Checking $PKG"
+	cd $SRC_DIR/$PKG-$VER
+	make check
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+
+	install -d $FAKEROOT/etc/udev/rules.d &&
+	install -d $FAKEROOT/usr/bin &&
+	cp -v sys/bitscope.rules $FAKEROOT/etc/udev/rules.d/81-bitscope.rules &&
+	cp -v bitscope-dso $FAKEROOT/usr/bin &&
+	cp -v start-bitscope-dso $FAKEROOT/usr/bin &&
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
+
+preinstallPackage() {
+	logMessage "PreInstall $PKG"
+	cd $PKG_DIR
+	logMessage "Extracting $PKG package"
+	tar -xvzf $PKG-$VER.tar.gz || die "$PKG package extraction failed"
+	cd $FAKEROOT
+	return $?
+}
+
+# install the program from the standalone package
+installPackage() {
+	logMessage "Installing $PKG"
+	logMessage "CDing to $PKG fakeroot"
+	cd $FAKEROOT || die "$PKG fakeroot does not exist"
+
+	logMessage "Creating $PKG directories"
+	for dir in $(find . -type d | sed -e 's@./@@'); do
+		install -dv /${dir} || die "Creating ${dir} for $PKG failed"
+	done
+
+	logMessage "Copying $PKG files"
+	for file in $(find . ! -type d | sed -e 's@./@@'); do
+		cp -dpf "${file}" "/${file}" || die "Creating ${dir} for $PKG failed"
+	done
+}
+
+# records the files installed
+postinstallPackage() {
+	logMessage "PostInstall $PKG"
+	cd $FAKEROOT
+
+	logMessage "Logging installed files of $PKG"
+	find . ! -type d | sed -e 's@./@/@' > $PKG_INDEX/$PKG-$VER
+
+	logMessage "Deleting $PKG fakeroot"
+	cd $PKG_DIR
+	rm -rf $FAKEROOT
+	return
+}
+
+preremovePackage() {
+	logMessage "PreRemove $PKG"
+	return
+}
+
+removePackage() {
+	logMessage "Removing $PKG"
+	cd $PKG_INDEX
+	# go through all files before deleting anything
+	for file in $( cat $PKG_INDEX/$PKG-$VER ); do
+		#finds packages that need the same file
+		if grep -qlr "^$file$" --exclude=$PKG-$VER
+		then
+			die "$file needed by $(grep -lr "^$file$" --exclude=$PKG-$VER)"
+		fi
+	done
+
+	for file in $( cat $PKG_INDEX/$PKG-$VER ); do
+			rm -fv $file
+	done
+	return
+}
+
+postremovePackage() {
+	logMessage "PostRemove $PKG"
+	logMessage "Removing $PKG from index"
+	rm -v $PKG_INDEX/$PKG-$VER
+	return
+}
+
+deleteSource() {
+	logMessage "Deleting $PKG source"
+	rm -rfv $SRC_DIR/$PKG-$VER
+}
+
+deleteDownload() {
+	logMessage "Deleting $PKG source archive"
+	rm -rfv $SRC_DIR/$PKG-$VER.$EXT
+}
+
+deletePackage() {
+	logMessage "Deleting $PKG built package"
+	rm -rfv $PKG_DIR/$PKG-$VER.tar.gz
+}
