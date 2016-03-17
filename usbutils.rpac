@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="usbutils"
+VER="008"
+EXT="tar.xz" # extension of download
+URL="http://ftp.kernel.org/pub/linux/utils/usb/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The usb utils package contains utilities used to display information about USB buses in the system and the devices connected to them."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --datadir=/usr/share/hwdata"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS="libusb python2"
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	sed -i '/^usbids/ s:usb.ids:hwdata/&:' lsusb.py &&
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
+
+# Take compiled files and make them into a standalone package
+buildPackage() {
+	logMessage "Building $PKG to fakeroot"
+	cd $SRC_DIR/$PKG-$VER
+	make DESTDIR="$FAKEROOT" install || die "$PKG make install failed"
+
+	install -dm755 $FAKEROOT/usr/share/hwdata/ &&
+
+	cd $FAKEROOT/usr/share/hwdata
+	curl -L -O http://www.linux-usb.org/usb.ids ||
+
+	die "$PKG getting usb.ids failed"
+
+	cd $PKG_DIR
+	logMessage "Tarring and compressing $PKG"
+	tar -cvzf $PKG-$VER.tar.gz $PKG-$VER || die "$PKG package creation failed"
+	logMessage "Deleting $PKG fakeroot"
+	rm -rf $PKG-$VER
+}
