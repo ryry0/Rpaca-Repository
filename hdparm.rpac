@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="hdparm"
+VER="9.48"
+EXT="tar.gz" # extension of download
+URL="http://downloads.sourceforge.net/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="Hdparm package contains a utility that is useful for controlling ATA/IDE controllers and hard drives to increase performance + power saving."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	make $GLOBAL_CFLAGS $CFLAGS || die "Compiling $PKG source failed"
+}
