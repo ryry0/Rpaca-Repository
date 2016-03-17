@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Overloaded variables:
+PKG="libusb"
+VER="1.0.20"
+EXT="tar.bz2" # extension of download
+URL="http://downloads.sourceforge.net/$PKG/$PKG-$VER.$EXT"
+DESCRIPTION="The libusb package contains a library used by some applications for USB device access."
+CFLAGS=""
+CONF_FLAGS="--prefix=/usr --disable-static"
+FAKEROOT=$PKG_DIR/$PKG-$VER
+DEPS=""
+
+#---------------------------------------------------------------
+# Overloadable functions:
+
+compileSource() {
+	cd $SRC_DIR/$PKG-$VER
+	logMessage "Compiling $PKG"
+	./configure $CONF_FLAGS || die "Configure $PKG source failed"
+	make -j1 $CFLAGS || die "Compiling $PKG source failed"
+}
