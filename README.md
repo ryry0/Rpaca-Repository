@@ -98,7 +98,7 @@ Programming
 * inetutils - telnet
 * ~~sudo~~
 * 7zip
-* tlp
+* ~~tlp~~
 
 Scientific Computing
 
